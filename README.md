@@ -12,7 +12,7 @@ each lesson is a Python file full of tests that fail until you fill them in.
 |--------|-------|
 | `lesson00_finding_good_answers.py` | Objective functions, minimization, search |
 | `lesson01_keeping_constraints.py` | Feasibility, inequality and equality constraints |
-| `lesson02_genetic_algorithms.py` | Populations, evaluation, running a GA with pymoo |
+| `lesson02_bruteForce.py` | Exhaustive search, Cartesian product, curse of dimensionality |
 
 ---
 
@@ -83,5 +83,5 @@ Optimization-Koans/
 ├── conftest.py                 # shared test helpers (do not edit)
 ├── lesson00_finding_good_answers.py
 ├── lesson01_keeping_constraints.py
-└── lesson02_genetic_algorithms.py
+└── lesson02_bruteForce.py
 ```
