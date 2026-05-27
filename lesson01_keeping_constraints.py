@@ -15,7 +15,7 @@ There are two main kinds:
 Work through each koan. Replace FILL_ME_IN and implement any `pass` body.
 
 Run your progress with:
-    python optiKoans lesson01_keeping_constraints.py
+    python optiKoans.py lesson01_keeping_constraints.py
 """
 
 from conftest import FILL_ME_IN

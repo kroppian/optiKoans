@@ -2,8 +2,8 @@
 optiKoans — runner for Optimization Koans.
 
 Usage:
-    python optiKoans                             # global progress across all lessons
-    python optiKoans lesson00_finding_good_answers.py   # run a single lesson
+    python optiKoans.py                             # global progress across all lessons
+    python optiKoans.py lesson00_finding_good_answers.py   # run a single lesson
 """
 
 import os
@@ -17,7 +17,7 @@ import pytest
 # Helpers
 # ---------------------------------------------------------------------------
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 def _lesson_files():
@@ -95,9 +95,9 @@ def _print_progress(results):
     print(f"total passed: {total_passed}")
     print(f"total passed: {total_koans}")
 
-    if total_passed != total_koans: 
+    if total_passed != total_koans:
         print(f"You have not yet reached enlightenment. Breathe.")
-        print(f"Be joyful that there are is more to learn.")
+        print(f"Be joyful that there is more to learn.")
 
     return first_failing
 
@@ -114,11 +114,11 @@ def _run_single(filepath):
         sys.exit(1)
 
     res = pytest.main([filepath, "-v", "--tb=short", "--rootdir", ROOT])
-    
+
     if res != 0:
         print(f"{CYAN}You have not yet reached enlightenment. Breathe.")
-        print(f"Be joyful that there are is more to learn.{RESET}")
-        
+        print(f"Be joyful that there is more to learn.{RESET}")
+
     sys.exit(res)
 
 

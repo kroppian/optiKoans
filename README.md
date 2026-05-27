@@ -29,7 +29,7 @@ conda activate optikoans
 **2. Verify the install:**
 
 ```bash
-python optiKoans
+python optiKoans.py
 ```
 
 You should see a progress table with all koans listed as `0/N`.
@@ -47,7 +47,7 @@ implement every function that has a `pass` body.
 Test your progress on that lesson:
 
 ```bash
-python optiKoans lesson00_finding_good_answers.py
+python optiKoans.py lesson00_finding_good_answers.py
 ```
 
 Pytest will tell you exactly which koan failed and what it expected.
@@ -56,7 +56,7 @@ Fix it, save, and re-run. Repeat until all tests in the file pass.
 ### Check your global progress
 
 ```bash
-python optiKoans
+python optiKoans.py
 ```
 
 This prints a progress bar for every lesson and re-runs the first lesson that
@@ -78,8 +78,7 @@ still has failing koans, so you always know exactly where to focus.
 
 ```
 Optimization-Koans/
-├── optiKoans/                  # runner (python optiKoans)
-│   └── __main__.py
+├── optiKoans.py                # runner (python optiKoans.py)
 ├── environment.yml             # Anaconda environment
 ├── conftest.py                 # shared test helpers (do not edit)
 ├── lesson00_finding_good_answers.py

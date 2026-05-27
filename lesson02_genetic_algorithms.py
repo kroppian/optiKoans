@@ -17,7 +17,7 @@ We'll use **pymoo** — a Python framework built for this kind of optimization.
 Work through each koan. Replace FILL_ME_IN and implement any `pass` body.
 
 Run your progress with:
-    python optiKoans lesson02_genetic_algorithms.py
+    python optiKoans.py lesson02_genetic_algorithms.py
 """
 
 import numpy as np
