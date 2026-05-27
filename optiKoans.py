@@ -151,9 +151,11 @@ def _run_all():
              "-v", "--tb=short", "--rootdir", ROOT],
             cwd=ROOT,
         )
+        sys.exit(1)
     else:
         print(f"  {GREEN}{BOLD}All koans complete. You have reached enlightenment.{RESET}")
         sys.stdout.flush()
+        sys.exit(0)
 
 
 def main():

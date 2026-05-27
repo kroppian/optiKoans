@@ -10,6 +10,9 @@ class _FillMeIn:
             "  Replace FILL_ME_IN with your answer and try again.\n"
         )
 
+    def __ne__(self, other):
+        return True   # FILL_ME_IN is not equal to anything
+
     def __hash__(self):
         return id(self)
 
