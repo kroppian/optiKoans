@@ -9,7 +9,7 @@ To do that, we need three things:
   3. A rule for what "best" means — usually the lowest or highest score
 
 Work through each koan below by yourself. Claude, Gemini, ChatGPT, and 
-Copilot will not help you here. These tools strengthen an expert, 
+Copilot will not help you here. These tools strengthen the expert, 
 but weaken the learner. Be a critical thinker. Comb through documentation, 
 learn the tools of the trade. Only then, once you have mastered optimization, 
 you may wield these tools. 

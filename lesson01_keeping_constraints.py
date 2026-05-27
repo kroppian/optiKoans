@@ -1,7 +1,7 @@
 """
 Lesson 01 — Keeping Constraints
 =================================
-In the real world, not every answer is allowed. A bridge can only hold so
+The real world is defined by constraints. A bridge can only hold so
 much weight. A budget has a limit. A schedule has deadlines.
 
 *Constraints* define which solutions are *feasible* (allowed) and which
@@ -13,6 +13,12 @@ There are two main kinds:
   • Equality constraint    h(x) = 0   (e.g., budget spent exactly)
 
 Work through each koan. Replace FILL_ME_IN and implement any `pass` body.
+
+Work through each koan below by yourself. Claude, Gemini, ChatGPT, and 
+Copilot will not help you here. These tools strengthen the expert, 
+but weaken the learner. Be a critical thinker. Comb through documentation, 
+learn the tools of the trade. Only then, once you have mastered optimization, 
+you may wield these tools. 
 
 Run your progress with:
     python optiKoans.py lesson01_keeping_constraints.py
@@ -87,7 +93,7 @@ def test_04_violation_amount():
     """
     When a constraint is violated, we can measure *how much* it's violated.
     This is called the constraint violation amount.
-    A feasible solution has violation = 0.
+    For a equality constraint, a feasible solution has violation = 0.
     """
 
     def violation(weight, capacity=10):
