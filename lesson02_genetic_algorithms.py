@@ -125,6 +125,14 @@ def test_04_run_ga_and_find_minimum():
     pop_size   = FILL_ME_IN   # How many candidates per generation? Try 30 or 50.
     n_gen      = FILL_ME_IN   # How many generations to evolve? Try 50 or 100.
 
+    # Guard: these must be integers before we hand them to pymoo
+    assert isinstance(pop_size, int), (
+        "Replace FILL_ME_IN with an integer for pop_size (e.g. 30 or 50)."
+    )
+    assert isinstance(n_gen, int), (
+        "Replace FILL_ME_IN with an integer for n_gen (e.g. 50 or 100)."
+    )
+
     prob      = SphereProblem()
     algorithm = GA(pop_size=pop_size)
     result    = minimize(
@@ -152,6 +160,15 @@ def test_05_reading_the_result():
       result.X  — the best solution found (decision variables)
       result.F  — the objective value of that solution
     """
+    # Guard: _evaluate must be implemented (koan 03) for this to work correctly
+    _probe = {}
+    SphereProblem()._evaluate(np.array([[1.0, 1.0]]), _probe)
+    assert "F" in _probe, "Complete koan 03 (_evaluate) before attempting koan 05."
+    np.testing.assert_allclose(
+        _probe["F"][0][0], 2.0,
+        err_msg="Complete koan 03 (_evaluate) before attempting koan 05.",
+    )
+
     prob      = SphereProblem()
     algorithm = GA(pop_size=50)
     result    = minimize(

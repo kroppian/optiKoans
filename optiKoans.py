@@ -7,11 +7,14 @@ Usage:
 """
 
 import os
+import re
 import sys
 import glob as _glob
+import subprocess
 
-import pytest
-
+# ── Windows UTF-8 fix ──────────────────────────────────────────────────────
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -24,28 +27,26 @@ def _lesson_files():
     return sorted(_glob.glob(os.path.join(ROOT, "lesson*.py")))
 
 
-class _Counter:
-    """Minimal pytest plugin that counts pass/fail without printing."""
-
-    def __init__(self):
-        self.passed = 0
-        self.failed = 0
-
-    def pytest_runtest_logreport(self, report):
-        if report.when == "call":
-            if report.passed:
-                self.passed += 1
-            elif report.failed:
-                self.failed += 1
-
-
 def _count(filepath):
-    counter = _Counter()
-    pytest.main(
-        [filepath, "--tb=no", "-p", "no:terminal", "--rootdir", ROOT],
-        plugins=[counter],
+    """Return (passed, failed) for a lesson file by running pytest silently."""
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", filepath,
+         "--tb=no", "-q", "--no-header", "--rootdir", ROOT],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        cwd=ROOT,
     )
-    return counter.passed, counter.failed
+    passed = failed = 0
+    for line in result.stdout.splitlines():
+        m = re.search(r"(\d+) passed", line)
+        if m:
+            passed = int(m.group(1))
+        m = re.search(r"(\d+) failed", line)
+        if m:
+            failed = int(m.group(1))
+        m = re.search(r"(\d+) error", line)
+        if m:
+            failed += int(m.group(1))
+    return passed, failed
 
 
 # ---------------------------------------------------------------------------
@@ -61,9 +62,9 @@ BOLD  = "\033[1m"
 
 def _bar(passed, total):
     if total == 0:
-        return "░" * BAR_WIDTH
+        return "." * BAR_WIDTH
     filled = round(BAR_WIDTH * passed / total)
-    return "█" * filled + "░" * (BAR_WIDTH - filled)
+    return "#" * filled + "." * (BAR_WIDTH - filled)
 
 
 def _print_progress(results):
@@ -75,7 +76,7 @@ def _print_progress(results):
         None,
     )
 
-    divider = "─" * 62
+    divider = "-" * 62
     print()
     print(f"  {BOLD}Path to Enlightenment{RESET}")
     print(f"  {divider}")
@@ -83,8 +84,8 @@ def _print_progress(results):
     for name, passed, failed in results:
         total   = passed + failed
         bar     = _bar(passed, total)
-        status  = f"{GREEN}✓{RESET}" if failed == 0 and total > 0 else " "
-        pointer = f"  {CYAN}← you are here{RESET}" if name == first_failing else ""
+        status  = f"{GREEN}v{RESET}" if failed == 0 and total > 0 else " "
+        pointer = f"  {CYAN}<-- you are here{RESET}" if name == first_failing else ""
         label   = os.path.splitext(name)[0]
         print(f"  {label:<42}  {bar}  {passed:>2}/{total:<2}  {status}{pointer}")
 
@@ -93,7 +94,7 @@ def _print_progress(results):
     print()
 
     print(f"total passed: {total_passed}")
-    print(f"total passed: {total_koans}")
+    print(f"total koans:  {total_koans}")
 
     if total_passed != total_koans:
         print(f"You have not yet reached enlightenment. Breathe.")
@@ -113,13 +114,18 @@ def _run_single(filepath):
         print(f"File not found: {filepath}")
         sys.exit(1)
 
-    res = pytest.main([filepath, "-v", "--tb=short", "--rootdir", ROOT])
+    sys.stdout.flush()
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", filepath,
+         "-v", "--tb=short", "--rootdir", ROOT],
+        cwd=ROOT,
+    )
 
-    if res != 0:
-        print(f"{CYAN}You have not yet reached enlightenment. Breathe.")
+    if result.returncode != 0:
+        print(f"\n{CYAN}You have not yet reached enlightenment. Breathe.")
         print(f"Be joyful that there is more to learn.{RESET}")
 
-    sys.exit(res)
+    sys.exit(result.returncode)
 
 
 def _run_all():
@@ -139,9 +145,15 @@ def _run_all():
     if first_failing:
         filepath = os.path.join(ROOT, first_failing)
         print(f"  Running {first_failing} ...\n")
-        pytest.main([filepath, "-v", "--tb=short", "--rootdir", ROOT])
+        sys.stdout.flush()
+        subprocess.run(
+            [sys.executable, "-m", "pytest", filepath,
+             "-v", "--tb=short", "--rootdir", ROOT],
+            cwd=ROOT,
+        )
     else:
         print(f"  {GREEN}{BOLD}All koans complete. You have reached enlightenment.{RESET}")
+        sys.stdout.flush()
 
 
 def main():
