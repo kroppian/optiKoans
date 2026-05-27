@@ -93,7 +93,10 @@ def test_04_violation_amount():
     """
     When a constraint is violated, we can measure *how much* it's violated.
     This is called the constraint violation amount.
-    For a equality constraint, a feasible solution has violation = 0.
+    For equality consraints, a violation would be any value greater than or 
+    less than 0 (i.e., any number not 0)
+    For inequality constraints, traditionally a violation would be any value 
+    greater than 0. 0 or negative values, on the other hand, are feasible.
     """
 
     def violation(weight, capacity=10):
