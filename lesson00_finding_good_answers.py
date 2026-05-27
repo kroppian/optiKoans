@@ -1,15 +1,21 @@
 """
-Lesson 00 — Finding Good Answers
+Lesson 00 — Finding the best in problems 
 =================================
-Optimization is the process of finding the *best* answer to a problem.
+The heart of optimization is finding the best answer to a problem. 
 
 To do that, we need three things:
   1. A set of possible answers (the search space)
   2. A way to score each answer (the objective function)
   3. A rule for what "best" means — usually the lowest or highest score
 
-Work through each koan below. Replace every FILL_ME_IN with the correct
-value, and implement every function that has a `pass` body.
+Work through each koan below by yourself. Claude, Gemini, ChatGPT, and 
+Copilot will not help you here. These tools strengthen an expert, 
+but weaken the learner. Be a critical thinker. Comb through documentation, 
+learn the tools of the trade. Only then, once you have mastered optimization, 
+you may wield these tools. 
+
+To follow the path to optimization enlightenment, replace every FILL_ME_IN with 
+the correct value, and implement every function that has a `pass` body.
 
 Run your progress with:
     python optiKoans lesson00_finding_good_answers.py
@@ -93,23 +99,23 @@ def test_04_maximization():
 def test_05_multi_variable_objective():
     """
     Objective functions can take more than one variable.
-    Here, f(x, y) = x^2 + y^2 is minimized when both x and y are zero.
+    Here, f(x1, x2) = x1^2 + x2^2 is minimized when both x1 and x2 are zero.
     """
 
-    def f(x, y):
-        return x ** 2 + y ** 2
+    def f(x1, x2):
+        return x1 ** 2 + x2 ** 2
 
     assert f(0, 0) == FILL_ME_IN   # What is f(0, 0)?
     assert f(3, 4) == FILL_ME_IN   # What is f(3, 4)?
 
-    # Which (x, y) pair gives a lower score?
+    # Which (x1, x2) pair gives a lower score?
     lower_score_pair = FILL_ME_IN  # Replace with (0, 0) or (3, 4)
     candidates = [(0, 0), (3, 4)]
     assert lower_score_pair == min(candidates, key=lambda p: f(*p))
 
 
 # ---------------------------------------------------------------------------
-# Koan 06 — Implement your own search   (first function-implementation koan)
+# Koan 06 — Implement your own search  
 # ---------------------------------------------------------------------------
 
 def find_minimum(f, candidates):
