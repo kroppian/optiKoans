@@ -92,6 +92,13 @@ def _print_progress(results):
     print(f"  Total: {total_passed} / {total_koans} koans complete")
     print()
 
+    print(f"total passed: {total_passed}")
+    print(f"total passed: {total_koans}")
+
+    if total_passed != total_koans: 
+        print(f"You have not yet reached enlightenment. Breathe.")
+        print(f"Be joyful that there are is more to learn.")
+
     return first_failing
 
 
@@ -105,7 +112,14 @@ def _run_single(filepath):
     if not os.path.exists(filepath):
         print(f"File not found: {filepath}")
         sys.exit(1)
-    sys.exit(pytest.main([filepath, "-v", "--tb=short", "--rootdir", ROOT]))
+
+    res = pytest.main([filepath, "-v", "--tb=short", "--rootdir", ROOT])
+    
+    if res != 0:
+        print(f"{CYAN}You have not yet reached enlightenment. Breathe.")
+        print(f"Be joyful that there are is more to learn.{RESET}")
+        
+    sys.exit(res)
 
 
 def _run_all():
