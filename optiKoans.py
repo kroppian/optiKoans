@@ -7,10 +7,10 @@ Usage:
 """
 
 import os
-import re
 import sys
 import glob as _glob
-import subprocess
+
+import pytest
 
 # ── Windows UTF-8 fix ──────────────────────────────────────────────────────
 if hasattr(sys.stdout, "reconfigure"):
@@ -27,26 +27,29 @@ def _lesson_files():
     return sorted(_glob.glob(os.path.join(ROOT, "lesson*.py")))
 
 
+class _Counter:
+    """Pytest plugin that tallies passed and failed tests."""
+
+    def __init__(self):
+        self.passed = 0
+        self.failed = 0
+
+    def pytest_runtest_logreport(self, report):
+        if report.when == "call":
+            if report.passed:
+                self.passed += 1
+            elif report.failed:
+                self.failed += 1
+
+
 def _count(filepath):
     """Return (passed, failed) for a lesson file by running pytest silently."""
-    result = subprocess.run(
-        [sys.executable, "-m", "pytest", filepath,
-         "--tb=no", "-q", "--no-header", "--rootdir", ROOT],
-        capture_output=True, text=True, encoding="utf-8", errors="replace",
-        cwd=ROOT,
+    counter = _Counter()
+    pytest.main(
+        [filepath, "--rootdir", str(ROOT), "-p", "no:terminal"],
+        plugins=[counter],
     )
-    passed = failed = 0
-    for line in result.stdout.splitlines():
-        m = re.search(r"(\d+) passed", line)
-        if m:
-            passed = int(m.group(1))
-        m = re.search(r"(\d+) failed", line)
-        if m:
-            failed = int(m.group(1))
-        m = re.search(r"(\d+) error", line)
-        if m:
-            failed += int(m.group(1))
-    return passed, failed
+    return counter.passed, counter.failed
 
 
 # ---------------------------------------------------------------------------
@@ -115,17 +118,15 @@ def _run_single(filepath):
         sys.exit(1)
 
     sys.stdout.flush()
-    result = subprocess.run(
-        [sys.executable, "-m", "pytest", filepath,
-         "-v", "--tb=short", "--rootdir", ROOT],
-        cwd=ROOT,
+    exit_code = pytest.main(
+        [filepath, "-v", "--tb=short", "--rootdir", str(ROOT)],
     )
 
-    if result.returncode != 0:
+    if exit_code != 0:
         print(f"\n{CYAN}You have not yet reached enlightenment. Breathe.")
         print(f"Be joyful that there is more to learn.{RESET}")
 
-    sys.exit(result.returncode)
+    sys.exit(exit_code)
 
 
 def _run_all():
@@ -146,10 +147,8 @@ def _run_all():
         filepath = os.path.join(ROOT, first_failing)
         print(f"  Running {first_failing} ...\n")
         sys.stdout.flush()
-        subprocess.run(
-            [sys.executable, "-m", "pytest", filepath,
-             "-v", "--tb=short", "--rootdir", ROOT],
-            cwd=ROOT,
+        pytest.main(
+            [filepath, "-v", "--tb=short", "--rootdir", str(ROOT)],
         )
         sys.exit(1)
     else:
