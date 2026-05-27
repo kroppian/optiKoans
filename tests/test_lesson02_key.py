@@ -1,122 +1,101 @@
 """
-Answer-key regression tests for lesson02_genetic_algorithms.py.
+Answer-key regression tests for lesson02_bruteForce.py.
 
 Each test mirrors one koan with the correct answer filled in.
-The SphereProblem reference implementation is defined here independently
-of the lesson file so these tests never depend on the student's progress.
+brute_force_minimize is implemented here independently of the lesson file
+so these tests never depend on student progress.
 """
 
-import numpy as np
-import numpy.testing as npt
-import pytest
-
-from pymoo.algorithms.soo.nonconvex.ga import GA
-from pymoo.core.problem import Problem
-from pymoo.optimize import minimize
+from itertools import product
 
 
 # ---------------------------------------------------------------------------
-# Reference implementation of SphereProblem (answer to koan 03)
+# Reference implementation (answer to koan 06)
 # ---------------------------------------------------------------------------
 
-class _SphereProblemRef(Problem):
-    """Correct implementation of SphereProblem used by the answer-key tests."""
-
-    def __init__(self):
-        super().__init__(n_var=2, n_obj=1, xl=-5.0, xu=5.0)
-
-    def _evaluate(self, X, out, *args, **kwargs):
-        out["F"] = np.sum(X ** 2, axis=1, keepdims=True)
+def _brute_force_minimize(f, x1_min, x1_max, x2_min, x2_max):
+    space = product(range(x1_min, x1_max + 1), range(x2_min, x2_max + 1))
+    return min(space, key=f)
 
 
 # ---------------------------------------------------------------------------
-# Koan 01 — population shape
+# Koan 01
 # ---------------------------------------------------------------------------
 
-def test_koan01_population_shape_answers():
-    population = np.random.rand(20, 3)
-    assert population.shape[0] == 20
-    assert population.shape[1] == 3
+def test_koan01_evaluates_all_answers():
+    calls = []
 
-
-# ---------------------------------------------------------------------------
-# Koan 02 — evaluating the population
-# ---------------------------------------------------------------------------
-
-def test_koan02_evaluate_population_answers():
     def f(x):
-        return np.sum(x ** 2)
+        calls.append(x)
+        return (x - 4) ** 2
 
-    population = np.array([
-        [1.0, 0.0],
-        [0.0, 0.0],
-        [1.0, 1.0],
-    ])
-    scores = [f(ind) for ind in population]
+    best = min(range(0, 10), key=f)
 
-    assert scores[0] == 1.0
-    assert scores[1] == 0.0
-    assert scores[2] == 2.0
+    assert len(calls) == 10
+    assert best == 4
 
 
 # ---------------------------------------------------------------------------
-# Koan 03 — _evaluate reference implementation
+# Koan 02
 # ---------------------------------------------------------------------------
 
-def test_koan03_evaluate_sets_F():
-    prob = _SphereProblemRef()
-    X = np.array([[0.0, 0.0], [1.0, 1.0], [3.0, 4.0]])
-    out = {}
-    prob._evaluate(X, out)
+def test_koan02_grid_search_space_answers():
+    space = list(product([0, 1, 2], [0, 1, 2, 3]))
 
-    assert "F" in out
-    assert out["F"].shape == (3, 1)
-    npt.assert_allclose(out["F"][0][0], 0.0)
-    npt.assert_allclose(out["F"][1][0], 2.0)
-    npt.assert_allclose(out["F"][2][0], 25.0)
-
-
-def test_koan03_evaluate_batch_size_one():
-    prob = _SphereProblemRef()
-    out = {}
-    prob._evaluate(np.array([[3.0, 4.0]]), out)
-    npt.assert_allclose(out["F"][0][0], 25.0)
+    assert len(space) == 12
+    assert space[0]   == (0, 0)
+    assert space[-1]  == (2, 3)
 
 
 # ---------------------------------------------------------------------------
-# Koan 04 — run the GA (pop_size=50, n_gen=100 converges reliably)
+# Koan 03
 # ---------------------------------------------------------------------------
 
-def test_koan04_ga_converges_with_reference_pop50_gen100():
-    prob      = _SphereProblemRef()
-    algorithm = GA(pop_size=50)
-    result    = minimize(prob, algorithm, termination=("n_gen", 100),
-                         seed=42, verbose=False)
-    assert result.F[0] < 0.5, (
-        f"GA with pop_size=50, n_gen=100 should converge near 0; got {result.F[0]:.4f}"
-    )
+def test_koan03_brute_force_2d_answer():
+    def f(x1, x2):
+        return (x1 - 1) ** 2 + (x2 - 2) ** 2
 
+    best = min(product(range(5), range(5)), key=lambda p: f(*p))
 
-@pytest.mark.parametrize("pop_size,n_gen", [(30, 50), (50, 100)])
-def test_koan04_valid_parameter_choices(pop_size, n_gen):
-    """Both suggested parameter pairs should satisfy the koan threshold."""
-    prob      = _SphereProblemRef()
-    algorithm = GA(pop_size=pop_size)
-    result    = minimize(prob, algorithm, termination=("n_gen", n_gen),
-                         seed=42, verbose=False)
-    assert result.F[0] < 0.5
+    assert best == (1, 2)
 
 
 # ---------------------------------------------------------------------------
-# Koan 05 — reading the result
+# Koan 04
 # ---------------------------------------------------------------------------
 
-def test_koan05_result_shape_answers():
-    prob      = _SphereProblemRef()
-    algorithm = GA(pop_size=50)
-    result    = minimize(prob, algorithm, termination=("n_gen", 100),
-                         seed=7, verbose=False)
+def test_koan04_exponential_growth_answers():
+    assert len(list(product(range(10), repeat=1))) == 10
+    assert len(list(product(range(10), repeat=2))) == 100
+    assert len(list(product(range(10), repeat=3))) == 1000
 
-    assert result.X.shape[0] == 2   # n_var decision variables
-    assert result.F.shape[0] == 1   # n_obj objectives
-    assert (result.F[0] < 1.0) == True
+
+# ---------------------------------------------------------------------------
+# Koan 05
+# ---------------------------------------------------------------------------
+
+def test_koan05_constraint_answers():
+    def f(x1, x2):
+        return x1 + x2
+
+    def is_feasible(x1, x2):
+        return x1 + x2 >= 5
+
+    all_candidates = list(product(range(6), range(6)))
+    feasible = [(x1, x2) for x1, x2 in all_candidates if is_feasible(x1, x2)]
+    best = min(feasible, key=lambda p: f(*p))
+
+    assert len(feasible) == 21
+    assert best == (0, 5)
+
+
+# ---------------------------------------------------------------------------
+# Koan 06
+# ---------------------------------------------------------------------------
+
+def test_koan06_implementation():
+    def f(pair):
+        x1, x2 = pair
+        return (x1 - 2) ** 2 + (x2 - 3) ** 2
+
+    assert _brute_force_minimize(f, 0, 5, 0, 5) == (2, 3)
