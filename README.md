@@ -1,7 +1,5 @@
 # Optimization Koans
 
-> *"The master said: fill in the blank, and the answer will find you."*
-
 Optimization Koans teaches you how to find the best answers to hard problems
 — one small exercise at a time. Inspired by [Ruby Koans](https://www.rubykoans.com/),
 each lesson is a Python file full of tests that fail until you fill them in.
@@ -32,7 +30,7 @@ conda activate optikoans
 python optiKoans.py
 ```
 
-You should see a progress table with all koans listed as `0/N`.
+~~You should see a progress table with all koans listed as `0/N`.~~ (WIP)
 
 ---
 
@@ -59,8 +57,7 @@ Fix it, save, and re-run. Repeat until all tests in the file pass.
 python optiKoans.py
 ```
 
-This prints a progress bar for every lesson and re-runs the first lesson that
-still has failing koans, so you always know exactly where to focus.
+~~This prints a progress bar for every lesson and re-runs the first lesson that still has failing koans, so you always know exactly where to focus.~~ (WIP)
 
 ---
 
