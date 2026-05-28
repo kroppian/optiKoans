@@ -34,9 +34,9 @@ def test_01_objective_function_returns_a_number():
     def f(x):
         return x ** 2
 
-    assert f(0) == FILL_ME_IN   # What is f(0)?
-    assert f(3) == FILL_ME_IN   # What is f(3)?
-    assert f(-2) == FILL_ME_IN  # What is f(-2)?
+    assert f(0) == 0   # What is f(0)?
+    assert f(3) == 9   # What is f(3)?
+    assert f(-2) == 4  # What is f(-2)?
 
 
 # ---------------------------------------------------------------------------
@@ -50,7 +50,7 @@ def test_02_lower_is_better():
     """
     scores = [9, 4, 1, 0, 1, 4, 9]
 
-    best_score = FILL_ME_IN  # What is the minimum score in this list?
+    best_score = 0  # What is the minimum score in this list?
     assert min(scores) == best_score
 
 
@@ -69,7 +69,7 @@ def test_03_finding_the_best_input():
 
     candidates = list(range(7))   # [0, 1, 2, 3, 4, 5, 6]
 
-    best_x = FILL_ME_IN  # Which x gives the lowest f(x)?
+    best_x = 3  # Which x gives the lowest f(x)?
     assert best_x == min(candidates, key=f)
 
 
@@ -88,7 +88,7 @@ def test_04_maximization():
 
     candidates = list(range(11))   # prices 0 through 10
 
-    best_price = FILL_ME_IN  # Which price maximizes profit?
+    best_price = 5  # Which price maximizes profit?
     assert best_price == max(candidates, key=profit)
 
 
@@ -105,11 +105,11 @@ def test_05_multi_variable_objective():
     def f(x1, x2):
         return x1 ** 2 + x2 ** 2
 
-    assert f(0, 0) == FILL_ME_IN   # What is f(0, 0)?
-    assert f(3, 4) == FILL_ME_IN   # What is f(3, 4)?
+    assert f(0, 0) == 0   # What is f(0, 0)?
+    assert f(3, 4) == 25   # What is f(3, 4)?
 
     # Which (x1, x2) pair gives a lower score?
-    lower_score_pair = FILL_ME_IN  # Replace with (0, 0) or (3, 4)
+    lower_score_pair = (0, 0)  # Replace with (0, 0) or (3, 4)
     candidates = [(0, 0), (3, 4)]
     assert lower_score_pair == min(candidates, key=lambda p: f(*p))
 
@@ -125,7 +125,8 @@ def find_minimum(f, candidates):
     Replace `pass` with your implementation.
     Hint: Python's built-in min() accepts a key= argument.
     """
-    pass  # TODO: implement this
+    
+    return min(candidates, key=f)
 
 
 def test_06_implement_find_minimum():

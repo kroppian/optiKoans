@@ -1,150 +1,162 @@
 """
-Lesson 01 — Keeping Constraints
-=================================
-The real world is defined by constraints. A bridge can only hold so
-much weight. A budget has a limit. A schedule has deadlines.
+Lesson 02 — Brute Force Optimization
+======================================
+The simplest optimization strategy: try every possible candidate,
+score each one, and keep the best.
 
-*Constraints* define which solutions are *feasible* (allowed) and which
-are *infeasible* (not allowed). Optimization finds the best feasible
-solution.
+Brute force *guarantees* finding the global optimum — but only
+when the search space is small enough to enumerate completely.
 
-There are two main kinds:
-  • Inequality constraint  g(x) ≤ 0   (e.g., weight ≤ capacity)
-  • Equality constraint    h(x) = 0   (e.g., budget spent exactly)
+As the number of variables grows, the search space explodes:
+with k choices per variable and n variables there are k^n candidates.
+This is called the *curse of dimensionality*.
 
-Work through each koan. Replace FILL_ME_IN and implement any `pass` body.
+Understanding brute force matters because:
+  1. It sets the baseline every smarter method must beat
+  2. It reveals why real-world optimization algorithms exist
+  3. It is the right tool when the search space is genuinely small
 
-Work through each koan below by yourself. Claude, Gemini, ChatGPT, and 
-Copilot will not help you here. These tools strengthen the expert, 
-but weaken the learner. Be a critical thinker. Comb through documentation, 
-learn the tools of the trade. Only then, once you have mastered optimization, 
-you may wield these tools. 
+Work through each koan below by yourself. Claude, Gemini, ChatGPT, and
+Copilot will not help you here. These tools strengthen the expert,
+but weaken the learner. Be a critical thinker. Comb through documentation,
+learn the tools of the trade. Only then, once you have mastered optimization,
+you may wield these tools.
 
 Run your progress with:
-    python optiKoans.py lesson01_keeping_constraints.py
+    python optiKoans.py lesson02_bruteForce.py
 """
+
+from itertools import product
 
 from conftest import FILL_ME_IN
 
 
 # ---------------------------------------------------------------------------
-# Koan 01 — Is a solution feasible?
+# Koan 01 — Brute force evaluates every candidate
 # ---------------------------------------------------------------------------
 
-def test_01_feasibility():
+def test_01_brute_force_evaluates_all():
     """
-    A solution is *feasible* if it satisfies all constraints.
-    Here the only rule is: weight must not exceed the capacity of 10.
+    Brute force works by calling f on every candidate in the search space
+    and returning the one with the lowest score.
     """
+    calls = []
 
-    def is_feasible(weight, capacity=10):
-        return weight <= capacity
+    def f(x):
+        calls.append(x)
+        return (x - 4) ** 2   # minimum at x = 4
 
-    assert is_feasible(8)  == FILL_ME_IN   # Is a weight of 8 feasible?
-    assert is_feasible(10) == FILL_ME_IN   # Is a weight of 10 feasible?
-    assert is_feasible(12) == FILL_ME_IN   # Is a weight of 12 feasible?
+    candidates = range(0, 10)
+    best = min(candidates, key=f)
 
-
-# ---------------------------------------------------------------------------
-# Koan 02 — Inequality constraints written in standard form  g(x) ≤ 0
-# ---------------------------------------------------------------------------
-
-def test_02_inequality_constraint_standard_form():
-    """
-    Textbooks write inequality constraints as  g(x) ≤ 0.
-    The constraint "weight ≤ 10" becomes  g(x) = weight - 10 ≤ 0.
-    A solution is feasible when g(x) ≤ 0.
-    """
-
-    def g(weight):
-        return weight - 10   # feasible when g(weight) <= 0
-
-    assert (g(8)  <= 0) == FILL_ME_IN   # Is weight=8  feasible?
-    assert (g(10) <= 0) == FILL_ME_IN   # Is weight=10 feasible?
-    assert (g(12) <= 0) == FILL_ME_IN   # Is weight=12 feasible?
+    assert len(calls) == 10 # How many candidates were evaluated?
+    assert best       == 4  # Which x minimises (x − 4)²?
 
 
 # ---------------------------------------------------------------------------
-# Koan 03 — Equality constraints  h(x) = 0
+# Koan 02 — Generating a 2-D search space
 # ---------------------------------------------------------------------------
 
-def test_03_equality_constraint():
+def test_02_grid_search_space():
     """
-    An equality constraint forces a solution to hit an exact value.
-    h(x) = x - 5 = 0 means x must equal exactly 5.
+    For two variables, the search space is the Cartesian product of each
+    variable's candidate values.  itertools.product builds it for you.
     """
+    x1_values = [0, 1, 2]       # 3 choices for x1
+    x2_values = [0, 1, 2, 3]    # 4 choices for x2
+    space = list(product(x1_values, x2_values))
 
-    def h(x):
-        return x - 5   # feasible only when h(x) == 0
-
-    assert h(5)   == FILL_ME_IN   # What is h(5)?
-    assert h(6)   == FILL_ME_IN   # What is h(6)?
-    assert h(4.9) == FILL_ME_IN   # What is h(4.9)?
-
-    # Is x=5 a feasible solution for this equality constraint?
-    assert (h(5) == 0) == FILL_ME_IN   # True or False?
+    assert len(space) == 12   # How many (x1, x2) pairs are there?
+    assert space[0]   == (0, 0)   # What is the very first pair?
+    assert space[-1]  == (2, 3)   # What is the very last pair?
 
 
 # ---------------------------------------------------------------------------
-# Koan 04 — How much does a violation cost?
+# Koan 03 — Brute force over a 2-D space
 # ---------------------------------------------------------------------------
 
-def test_04_violation_amount():
+def test_03_brute_force_2d():
     """
-    When a constraint is violated, we can measure *how much* it's violated.
-    This is called the constraint violation amount.
-    For equality consraints, a violation would be any value greater than or 
-    less than 0 (i.e., any number not 0)
-    For inequality constraints, traditionally a violation would be any value 
-    greater than 0. 0 or negative values, on the other hand, are feasible.
+    Brute force generalizes to any number of variables: try every
+    (x1, x2) pair and keep the one that minimises f.
     """
 
-    def violation(weight, capacity=10):
-        return max(0, weight - capacity)   # 0 if feasible, positive if not
+    def f(x1, x2):
+        return (x1 - 1) ** 2 + (x2 - 2) ** 2   # minimum at (1, 2)
 
-    assert violation(8)  == FILL_ME_IN   # How much does weight=8  violate?
-    assert violation(10) == FILL_ME_IN   # How much does weight=10 violate?
-    assert violation(13) == FILL_ME_IN   # How much does weight=13 violate?
+    space = product(range(5), range(5))   # x1, x2 ∈ {0, 1, 2, 3, 4}
+    best = min(space, key=lambda p: f(*p))
+
+    assert best == (1, 2)   # What (x1, x2) pair minimises f?
 
 
 # ---------------------------------------------------------------------------
-# Koan 05 — Multiple constraints must all be satisfied
+# Koan 04 — The search space grows exponentially
 # ---------------------------------------------------------------------------
 
-def test_05_multiple_constraints():
+def test_04_exponential_growth():
     """
-    A solution must satisfy *every* constraint to be feasible.
-    Here: weight ≤ 10 AND cost ≤ 50.
+    With k choices per variable and n variables, there are k^n candidates.
+    This 'curse of dimensionality' is why brute force breaks for large problems.
     """
+    # 1 variable, 10 choices each → how many candidates?
+    assert len(list(product(range(10), repeat=1))) == 10
 
-    def is_feasible(weight, cost):
-        return weight <= 10 and cost <= 50
+    # 2 variables, 10 choices each → how many candidates?
+    assert len(list(product(range(10), repeat=2))) == 100
 
-    assert is_feasible(8,  40) == FILL_ME_IN   # weight OK, cost OK
-    assert is_feasible(12, 40) == FILL_ME_IN   # weight over, cost OK
-    assert is_feasible(8,  60) == FILL_ME_IN   # weight OK, cost over
-    assert is_feasible(12, 60) == FILL_ME_IN   # both over
+    # 3 variables, 10 choices each → how many candidates?
+    assert len(list(product(range(10), repeat=3))) == 1000
 
 
 # ---------------------------------------------------------------------------
-# Koan 06 — Implement a penalty function   (function-implementation koan)
+# Koan 05 — Brute force with a feasibility filter
 # ---------------------------------------------------------------------------
 
-def penalty(weight, capacity=10, penalty_weight=1000):
+def test_05_brute_force_with_constraint():
     """
-    Return the penalty for a constraint violation.
+    When a constraint exists, brute force first filters for feasible
+    candidates, then minimises over that subset.
+    """
 
-    Rules:
-      • If weight <= capacity: penalty is 0  (solution is feasible)
-      • Otherwise: penalty = (amount of violation) * penalty_weight
+    def f(x1, x2):
+        return x1 + x2   # minimise total
+
+    def is_feasible(x1, x2):
+        return x1 + x2 >= 5   # constraint: sum must be at least 5
+
+    all_candidates = list(product(range(6), range(6)))
+    feasible = [(x1, x2) for x1, x2 in all_candidates if is_feasible(x1, x2)]
+    best = min(feasible, key=lambda p: f(*p))
+
+    assert len(feasible) == 21   # How many candidates are feasible?
+    assert best          == (0,5)   # Which feasible pair minimises f?
+
+
+# ---------------------------------------------------------------------------
+# Koan 06 — Implement brute_force_minimize
+# ---------------------------------------------------------------------------
+
+def brute_force_minimize(f, x1_min, x1_max, x2_min, x2_max):
+    """
+    Return the (x1, x2) pair that minimises f over the integer grid
+    x1 ∈ [x1_min, x1_max] and x2 ∈ [x2_min, x2_max] (both ends inclusive).
 
     Replace `pass` with your implementation.
+    Hint: build the search space with product(range(...), range(...)).
     """
-    pass  # TODO: implement this
+    
+    space = product(range(x1_min, x1_max), range(x2_min, x2_max))   # x1, x2 ∈ {0, 1, 2, 3, 4}
+    best = min(space, key=lambda p: f(p))
+    return best
 
 
-def test_06_implement_penalty():
-    assert penalty(8)  == 0,        "weight=8  is feasible — penalty should be 0"
-    assert penalty(10) == 0,        "weight=10 is exactly at capacity — still 0"
-    assert penalty(15) == 5 * 1000, "weight=15 exceeds capacity by 5 — penalty is 5000"
-    assert penalty(11, capacity=10, penalty_weight=500) == 500
+def test_06_implement_brute_force_minimize():
+    def f(pair):
+        x1, x2 = pair
+        return (x1 - 2) ** 2 + (x2 - 3) ** 2   # minimum at (2, 3)
+
+    result = brute_force_minimize(f, 0, 5, 0, 5)
+    assert result == (2, 3), (
+        "brute_force_minimize should return the (x1, x2) pair that makes f smallest"
+    )
