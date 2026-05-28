@@ -1,14 +1,18 @@
 """
-Lesson 05 — Crossover
+Lesson 05 — Genetic Algorithms Part 1: Crossover
 ========================
 Monte Carlo drew candidates *independently* — each sample had no memory of
-what worked before. A Genetic Algorithm keeps a *population* of candidates
-and improves them by letting good individuals reproduce.
+what worked before. Moving forward, we're going to explore concepts of genetic
+algorithms, which use similar stochastic processes with a memory component. 
+Genetic algorithms work by evolving an initial random "population" of 
+solutions (i.e., a single Monte Carlo simulation) into increasingly better
+solutions. This works by mimicking natural selection: nature's great optimizer.
 
-The key reproduction operator is *crossover* (also called recombination).
-Two parent bit strings are split at a randomly chosen *crossover point* and
-their tails are swapped, producing two children that each inherit part of
-each parent's solution.
+
+In natural selection, the key reproduction operator is *crossover* (also called 
+recombination). In binary optimization, two parent bit strings are split at a 
+randomly chosen *crossover point* and their tails are swapped, producing two 
+children that each inherit part of each parent's solution.
 
 Why does this help?  Suppose parent1 has found a great selection of items
 for positions 0–3, and parent2 has found a great selection for positions 4–7.
@@ -91,7 +95,7 @@ def test_04_children_preserve_length():
     """
     parent1 = [1, 0, 1, 1, 0, 1, 0, 0]
     parent2 = [0, 1, 0, 0, 1, 0, 1, 1]
-    point   = 4
+    point   = 7 
 
     child1 = parent1[:point] + parent2[point:]
     child2 = parent2[:point] + parent1[point:]

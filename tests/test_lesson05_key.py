@@ -57,8 +57,8 @@ def test_koan03_second_child_answer():
 def test_koan04_children_preserve_length():
     parent1 = [1, 0, 1, 1, 0, 1, 0, 0]
     parent2 = [0, 1, 0, 0, 1, 0, 1, 1]
-    child1  = parent1[:4] + parent2[4:]
-    child2  = parent2[:4] + parent1[4:]
+    child1  = parent1[:7] + parent2[7:]
+    child2  = parent2[:7] + parent1[7:]
     assert len(child1) == 8
     assert len(child2) == 8
 
