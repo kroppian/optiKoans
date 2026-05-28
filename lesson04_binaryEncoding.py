@@ -111,10 +111,40 @@ def test_04_feasibility():
 
 
 # ---------------------------------------------------------------------------
-# Koan 05 — Penalized Objective
+# Koan 05 — Maximization as minimization
 # ---------------------------------------------------------------------------
 
-def test_05_penalized_objective():
+def test_05_maximization_as_minimization():
+    """
+    The knapsack problem asks us to *maximize* total value, but our optimizer
+    *minimizes* a score. The trick: minimizing -f(x) gives the same answer as
+    maximizing f(x). The candidate with the highest value gets the lowest
+    (most negative) score — making it the optimizer's preferred choice.
+    """
+    values = [4, 7, 5, 9, 2, 6, 8, 4]
+
+    def total_value(bits):
+        return sum(b * v for b, v in zip(bits, values))
+
+    bits_a = [1, 0, 1, 0, 0, 0, 0, 0]   # value = 4 + 5 = 9
+    bits_b = [0, 1, 0, 0, 0, 1, 0, 0]   # value = 7 + 6 = 13
+
+    # Negate to turn maximization into a minimization score
+    score_a = -total_value(bits_a)
+    score_b = -total_value(bits_b)
+
+    assert score_a == FILL_ME_IN   # what is the minimization score for bits_a?
+    assert score_b == FILL_ME_IN   # what is the minimization score for bits_b?
+
+    # The selection with higher value has the lower (better) score
+    assert min(score_a, score_b) == FILL_ME_IN
+
+
+# ---------------------------------------------------------------------------
+# Koan 06 — Penalized Objective
+# ---------------------------------------------------------------------------
+
+def test_06_penalized_objective():
     """
 
     How do we handle constraints? One simple approach is to penalize the 
@@ -147,7 +177,7 @@ def test_05_penalized_objective():
 
 
 # ---------------------------------------------------------------------------
-# Koan 06 — Implement knapsack_score
+# Koan 07 — Implement knapsack_score
 # ---------------------------------------------------------------------------
 
 def knapsack_score(bits, weights, values, capacity, penalty_weight=1000):
@@ -166,7 +196,7 @@ def knapsack_score(bits, weights, values, capacity, penalty_weight=1000):
     pass  # TODO: implement this
 
 
-def test_06_implement_knapsack_score():
+def test_07_implement_knapsack_score():
     weights  = [2, 5, 3, 7, 1, 4, 6, 3]
     values   = [4, 7, 5, 9, 2, 6, 8, 4]
     capacity = 15

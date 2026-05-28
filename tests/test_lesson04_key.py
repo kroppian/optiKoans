@@ -8,7 +8,7 @@ so these tests never depend on student progress.
 
 
 # ---------------------------------------------------------------------------
-# Reference implementation (answer to koan 06)
+# Reference implementation (answer to koan 07)
 # ---------------------------------------------------------------------------
 
 def _knapsack_score(bits, weights, values, capacity, penalty_weight=1000):
@@ -68,7 +68,28 @@ def test_koan04_feasibility():
 # Koan 05
 # ---------------------------------------------------------------------------
 
-def test_koan05_penalized_score():
+def test_koan05_maximization_as_minimization():
+    values = [4, 7, 5, 9, 2, 6, 8, 4]
+
+    def total_value(bits):
+        return sum(b * v for b, v in zip(bits, values))
+
+    bits_a = [1, 0, 1, 0, 0, 0, 0, 0]   # value = 9
+    bits_b = [0, 1, 0, 0, 0, 1, 0, 0]   # value = 13
+
+    score_a = -total_value(bits_a)
+    score_b = -total_value(bits_b)
+
+    assert score_a == -9
+    assert score_b == -13
+    assert min(score_a, score_b) == -13
+
+
+# ---------------------------------------------------------------------------
+# Koan 06
+# ---------------------------------------------------------------------------
+
+def test_koan06_penalized_score():
     weights        = [2, 5, 3, 7, 1, 4, 6, 3]
     values         = [4, 7, 5, 9, 2, 6, 8, 4]
     capacity       = 15
@@ -85,10 +106,10 @@ def test_koan05_penalized_score():
 
 
 # ---------------------------------------------------------------------------
-# Koan 06
+# Koan 07
 # ---------------------------------------------------------------------------
 
-def test_koan06_knapsack_score_feasible():
+def test_koan07_knapsack_score_feasible():
     weights  = [2, 5, 3, 7, 1, 4, 6, 3]
     values   = [4, 7, 5, 9, 2, 6, 8, 4]
     capacity = 15
@@ -97,7 +118,7 @@ def test_koan06_knapsack_score_feasible():
     assert _knapsack_score([0, 0, 0, 0, 0, 0, 0, 0], weights, values, capacity) == 0
 
 
-def test_koan06_knapsack_score_infeasible():
+def test_koan07_knapsack_score_infeasible():
     weights  = [2, 5, 3, 7, 1, 4, 6, 3]
     values   = [4, 7, 5, 9, 2, 6, 8, 4]
     capacity = 15
@@ -107,7 +128,7 @@ def test_koan06_knapsack_score_infeasible():
                            penalty_weight=100) == 274
 
 
-def test_koan06_knapsack_score_feasible_always_beats_infeasible():
+def test_koan07_knapsack_score_feasible_always_beats_infeasible():
     """Any feasible solution should score better than any infeasible one
     when penalty_weight is large enough."""
     weights  = [2, 5, 3, 7, 1, 4, 6, 3]
