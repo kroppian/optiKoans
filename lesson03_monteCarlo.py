@@ -6,14 +6,14 @@ candidate. For large search spaces that becomes prohibitively expensive.
 
 Monte Carlo optimization takes a different approach: sample candidates
 *at random* and keep the best one found. It is faster than brute force
-because it never tries the whole space — it trades the guarantee of
+because it doesn't search the whole space — it trades the guarantee of
 optimality for speed.
 
-Two ideas make Monte Carlo useful in practice:
+Running a Monte Carlo algorithm has two key decisions to watch out for:
   1. Reproducibility — setting a *random seed* makes stochastic results
      repeatable, which is essential for testing and debugging.
   2. Budget — more samples means more of the space is explored, and the
-     best result found gets closer to the true optimum.
+     best result found likely gets closer to the true optimum.
 
 Monte Carlo does not *learn* from the candidates it has already tried.
 Each new sample is drawn independently, with no memory of what worked
@@ -70,10 +70,37 @@ def test_02_seeds_make_results_reproducible():
 
 
 # ---------------------------------------------------------------------------
-# Koan 03 — Best of N random samples
+# Koan 03 — Seed selection: any integer works, results vary
 # ---------------------------------------------------------------------------
 
-def test_03_best_of_n_samples():
+def test_03_seed_selection():
+    """
+    Seeds can be any integer — 0, 42, 99999. The choice of seed doesn't
+    make the algorithm better or worse; it determines *which* candidates
+    are drawn. Run the same budget with a few different seeds to observe
+    how much results vary with a small sample count.
+    """
+    def f(x):
+        return (x - 50) ** 2   # minimum at x = 50
+
+    def best_of_five(seed):
+        random.seed(seed)
+        return min((random.randint(0, 99) for _ in range(5)), key=f)
+
+    results = [best_of_five(seed) for seed in [0, 1, 2]]
+
+    # Do all three seeds produce the same best result?
+    assert (results[0] == results[1] == results[2]) == FILL_ME_IN
+
+    # What is the best result found across all three seeds?
+    assert min(results, key=f) == FILL_ME_IN
+
+
+# ---------------------------------------------------------------------------
+# Koan 04 — Best of N random samples
+# ---------------------------------------------------------------------------
+
+def test_04_best_of_n_samples():
     """
     Monte Carlo scores each random candidate and keeps the best.
     Run this code yourself to see which sample lands closest to the optimum.
@@ -89,32 +116,35 @@ def test_03_best_of_n_samples():
 
 
 # ---------------------------------------------------------------------------
-# Koan 04 — More samples → closer to the optimum
+# Koan 05 — Increasing the budget to find the exact optimum
 # ---------------------------------------------------------------------------
 
-def test_04_more_samples_closer_to_optimum():
+def test_05_increasing_budget_to_find_optimum():
     """
-    The more samples you draw, the greater your chance of landing near the
-    true optimum. This is the main tuning knob of Monte Carlo search.
+    With enough samples, Monte Carlo will eventually draw the exact optimum.
+    The trade-off: more samples means better quality but more compute time.
+    Try each budget below and find the smallest one that lands on x=50.
     """
     def f(x):
-        return (x - 50) ** 2   # minimum at x = 50
+        return (x - 50) ** 2   # true optimum at x = 50, decision space is [0, 99]
 
-    random.seed(0)
-    best_10   = min((random.randint(0, 99) for _ in range(10)),   key=f)
+    def best_of_n(n):
+        random.seed(0)
+        return min((random.randint(0, 99) for _ in range(n)), key=f)
 
-    random.seed(0)
-    best_1000 = min((random.randint(0, 99) for _ in range(1000)), key=f)
+    assert (best_of_n(10)  == 50) == FILL_ME_IN   # Best result with    10 samples?
+    assert (best_of_n(50)  == 50) == FILL_ME_IN   # Best result with    50 samples?
+    assert (best_of_n(200) == 50) == FILL_ME_IN   # Best result with   200 samples?
 
-    assert abs(best_10   - 50) == FILL_ME_IN  # Distance from optimum with    10 samples?
-    assert abs(best_1000 - 50) == FILL_ME_IN  # Distance from optimum with 1,000 samples?
+    # What is the smallest budget above that first hits the exact optimum?
+    assert best_of_n(FILL_ME_IN) == 50
 
 
 # ---------------------------------------------------------------------------
-# Koan 05 — 2-D Monte Carlo sampling
+# Koan 06 — 2-D Monte Carlo sampling
 # ---------------------------------------------------------------------------
 
-def test_05_2d_monte_carlo():
+def test_06_2d_monte_carlo():
     """
     Monte Carlo extends naturally to multiple variables: sample each
     variable independently and score the resulting pair.
@@ -130,7 +160,7 @@ def test_05_2d_monte_carlo():
 
 
 # ---------------------------------------------------------------------------
-# Koan 06 — Implement monte_carlo_minimize
+# Koan 07 — Implement monte_carlo_minimize
 # ---------------------------------------------------------------------------
 
 def monte_carlo_minimize(f, x1_min, x1_max, x2_min, x2_max, n_samples, seed):
@@ -155,7 +185,7 @@ def monte_carlo_minimize(f, x1_min, x1_max, x2_min, x2_max, n_samples, seed):
     pass  # TODO: implement this
 
 
-def test_06_implement_monte_carlo_minimize():
+def test_07_implement_monte_carlo_minimize():
     calls = []
 
     def f(pair):
