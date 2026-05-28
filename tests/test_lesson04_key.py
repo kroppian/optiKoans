@@ -68,7 +68,7 @@ def test_koan04_feasibility():
 # Koan 05
 # ---------------------------------------------------------------------------
 
-def test_koan05_penalised_score():
+def test_koan05_penalized_score():
     weights        = [2, 5, 3, 7, 1, 4, 6, 3]
     values         = [4, 7, 5, 9, 2, 6, 8, 4]
     capacity       = 15

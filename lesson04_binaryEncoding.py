@@ -4,19 +4,21 @@ Lesson 04 — Binary Encoding
 So far, the optimization problems we have seen used continuous or integer
 decision variables — a price, a grid coordinate, a sample from a range.
 
-Genetic algorithms work with *binary* solutions: each candidate is a list
-of 0s and 1s called a *bit string* (or *chromosome*).
+However, some problems can be represented as strings of binary strings. 
+In other words, each candidate is a list of 0s and 1s called a *bit string*.
+These will be increasingly relevant as we start learning about genetic 
+algorithms. 
 
 In this lesson the running example is the classic *0/1 knapsack*: given a
 set of items with known weights and values, decide which items to put in a
-bag without exceeding its weight capacity, while maximising total value.
+bag without exceeding its weight capacity, while maximizing total value.
 
 Each bit in the solution corresponds to one item:
   • 1  means "take the item"
   • 0  means "leave it behind"
 
 A bit string therefore encodes a complete selection of items. The goal is
-to find the bit string that maximises value while staying within capacity.
+to find the bit string that maximizes value while staying within capacity.
 
 Work through each koan below by yourself. Claude, Gemini, ChatGPT, and
 Copilot will not help you here. These tools strengthen the expert,
@@ -42,13 +44,13 @@ def test_01_bit_string_selects_items():
     Counting the 1s tells you how many items are selected.
     """
     # 8 items are available (indices 0–7)
-    bits = [1, 0, 0, 0, 0, 0, 0, 0]    # only item 0 is taken
+    bits = [1, 0, 0, 0, 0, 0, 0, 0]      # only item 0 is taken
     assert sum(bits) == FILL_ME_IN       # how many items are selected?
 
-    bits = [1, 0, 1, 0, 1, 0, 0, 0]    # items 0, 2, and 4 are taken
+    bits = [1, 0, 1, 0, 1, 0, 0, 0]      # items 0, 2, and 4 are taken
     assert sum(bits) == FILL_ME_IN       # how many items now?
 
-    bits = [1, 1, 1, 0, 1, 1, 0, 0]    # items 0, 1, 2, 4, 5 are taken
+    bits = [1, 1, 1, 0, 1, 1, 0, 0]      # items 0, 1, 2, 4, 5 are taken
     assert sum(bits) == FILL_ME_IN       # how many items now?
 
 
@@ -76,7 +78,7 @@ def test_02_total_weight():
 def test_03_total_value():
     """
     Multiply each bit by the corresponding item value and sum the results.
-    This is the quantity we want to maximise.
+    This is the quantity we want to maximize.
     """
     #          item:  0  1  2  3  4  5  6  7
     values        = [ 4, 7, 5, 9, 2, 6, 8, 4]
@@ -109,15 +111,18 @@ def test_04_feasibility():
 
 
 # ---------------------------------------------------------------------------
-# Koan 05 — Turn maximisation into minimisation with a penalty
+# Koan 05 — Penalized Objective
 # ---------------------------------------------------------------------------
 
-def test_05_penalised_score():
+def test_05_penalized_objective():
     """
-    Optimisers minimise a score. To maximise value, we minimise negative value.
-    Infeasible solutions are penalised by adding a large number proportional
-    to how much the weight exceeds capacity. This ensures infeasible candidates
-    are always scored worse than any feasible one.
+
+    How do we handle constraints? One simple approach is to penalize the 
+    objective function of infeasible solutions by adding a large number 
+    proportional to the magnitude of the constraint violation. In the case
+    of the knapsack problem, this would be how much the weight exceeds 
+    capacity. This ensures infeasible candidates are always scored worse than 
+    any feasible one.
 
       score = -total_value + max(0, total_weight - capacity) * penalty_weight
     """
@@ -137,7 +142,7 @@ def test_05_penalised_score():
     assert score(bits_feasible)   == FILL_ME_IN   # what is the score?
     assert score(bits_infeasible) == FILL_ME_IN   # what is the score?
 
-    # Lower score is better — which solution does the optimiser prefer?
+    # Lower score is better — which solution does the optimizer prefer?
     assert (score(bits_feasible) < score(bits_infeasible)) == FILL_ME_IN
 
 
