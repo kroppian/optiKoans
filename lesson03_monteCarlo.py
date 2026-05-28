@@ -65,8 +65,8 @@ def test_02_seeds_make_results_reproducible():
         random.seed(seed)
         return min(random.randint(0, 99) for _ in range(10))
 
-    assert (best_of_ten(42) == best_of_ten(42)) == FILL_ME_IN  # Same seed?
-    assert (best_of_ten(42) == best_of_ten(7))  == FILL_ME_IN  # Different seed?
+    assert (best_of_ten(42) == best_of_ten(42)) == True  # Same seed?
+    assert (best_of_ten(42) == best_of_ten(7))  == False  # Different seed?
 
 
 # ---------------------------------------------------------------------------
@@ -88,12 +88,13 @@ def test_03_seed_selection():
         return min((random.randint(0, 99) for _ in range(5)), key=f)
 
     results = [best_of_five(seed) for seed in [0, 1, 2]]
+    print(results)
 
     # Do all three seeds produce the same best result?
-    assert (results[0] == results[1] == results[2]) == FILL_ME_IN
+    assert (results[0] == results[1] == results[2]) == False
 
     # What is the best result found across all three seeds?
-    assert min(results, key=f) == FILL_ME_IN
+    assert min(results, key=f) == 49
 
 
 # ---------------------------------------------------------------------------
@@ -112,7 +113,7 @@ def test_04_best_of_n_samples():
     samples = [random.randint(0, 99) for _ in range(10)]
     best = min(samples, key=f)
 
-    assert best == FILL_ME_IN   # Which sample minimises f?
+    assert best == 49   # Which sample minimises f?
 
 
 # ---------------------------------------------------------------------------
@@ -132,12 +133,12 @@ def test_05_increasing_budget_to_find_optimum():
         random.seed(0)
         return min((random.randint(0, 99) for _ in range(n)), key=f)
 
-    assert (best_of_n(10)  == 50) == FILL_ME_IN   # Best result with    10 samples?
-    assert (best_of_n(50)  == 50) == FILL_ME_IN   # Best result with    50 samples?
-    assert (best_of_n(200) == 50) == FILL_ME_IN   # Best result with   200 samples?
+    assert (best_of_n(10)  == 50) == False  # Best result with    10 samples?
+    assert (best_of_n(50)  == 50) == False   # Best result with    50 samples?
+    assert (best_of_n(200) == 50) == True  # Best result with   200 samples?
 
     # What is the smallest budget above that first hits the exact optimum?
-    assert best_of_n(FILL_ME_IN) == 50
+    assert best_of_n(200) == 50
 
 
 # ---------------------------------------------------------------------------
@@ -156,7 +157,7 @@ def test_06_2d_monte_carlo():
     samples = [(random.randint(0, 9), random.randint(0, 9)) for _ in range(20)]
     best = min(samples, key=lambda p: f(*p))
 
-    assert best == FILL_ME_IN   # Which (x1, x2) pair minimises f?
+    assert best == (2, 4)   # Which (x1, x2) pair minimises f?
 
 
 # ---------------------------------------------------------------------------
@@ -182,7 +183,10 @@ def monte_carlo_minimize(f, x1_min, x1_max, x2_min, x2_max, n_samples, seed):
     Hint: call random.seed(seed), then draw n_samples (x1, x2) pairs using
     random.randint for each variable.
     """
-    pass  # TODO: implement this
+    random.seed(seed)
+    samples = [(random.randint(x1_min, x1_max), random.randint(x2_min, x2_max)) for _ in range(n_samples)]
+    best = min(samples, key=lambda p: f(p))
+    return best
 
 
 def test_07_implement_monte_carlo_minimize():
@@ -195,5 +199,5 @@ def test_07_implement_monte_carlo_minimize():
 
     result = monte_carlo_minimize(f, 0, 9, 0, 9, n_samples=50, seed=0)
 
-    assert len(calls) == FILL_ME_IN   # How many candidates should be evaluated?
+    assert len(calls) == 50  # How many candidates should be evaluated?
     assert result == min(list(calls), key=f)
