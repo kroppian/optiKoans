@@ -47,8 +47,8 @@ def test_01_sampling_integers():
     random.seed(0)
     draw = random.randint(0, 9)
 
-    assert 0 <= draw <= FILL_ME_IN       # What is the largest possible value?
-    assert isinstance(draw, FILL_ME_IN)  # What Python type does randint return?
+    assert 0 <= draw <= 9       # What is the largest possible value?
+    assert isinstance(draw, int)  # What Python type does randint return?
 
 
 # ---------------------------------------------------------------------------
