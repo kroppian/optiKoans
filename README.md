@@ -12,6 +12,9 @@ each lesson is a Python file full of tests that fail until you fill them in.
 | `lesson01_keeping_constraints.py` | Feasibility, inequality and equality constraints |
 | `lesson02_bruteForce.py` | Exhaustive search, Cartesian product, curse of dimensionality |
 | `lesson03_monteCarlo.py` | Stochastic search, random seeds, sampling budget |
+| `lesson04_binaryEncoding.py` | Binary decision spaces, knapsack problem, penalized objective |
+| `lesson05_crossover.py` | Genetic Algorithms Part 1: single-point crossover |
+| `lesson06_mutation.py` | Genetic Algorithms Part 2: bit-flip mutation |
 
 ---
 
@@ -58,7 +61,7 @@ Fix it, save, and re-run. Repeat until all tests in the file pass.
 python optiKoans.py
 ```
 
-~~This prints a progress bar for every lesson and re-runs the first lesson that still has failing koans, so you always know exactly where to focus.~~ (WIP)
+~~This prints a progress table for every lesson and re-runs the first lesson that still has failing koans, so you always know exactly where to focus.~~ (WIP)
 
 ---
 
@@ -76,11 +79,22 @@ python optiKoans.py
 
 ```
 Optimization-Koans/
-├── optiKoans.py                # runner (python optiKoans.py)
-├── environment.yml             # Anaconda environment
-├── conftest.py                 # shared test helpers (do not edit)
+├── optiKoans.py                    # runner (python optiKoans.py)
+├── environment.yml                 # Anaconda environment
+├── conftest.py                     # shared test helpers (do not edit)
 ├── lesson00_finding_good_answers.py
 ├── lesson01_keeping_constraints.py
 ├── lesson02_bruteForce.py
-└── lesson03_monteCarlo.py
+├── lesson03_monteCarlo.py
+├── lesson04_binaryEncoding.py
+├── lesson05_crossover.py
+├── lesson06_mutation.py
+└── tests/
+    ├── test_lesson00_key.py
+    ├── test_lesson01_key.py
+    ├── test_lesson02_key.py
+    ├── test_lesson03_key.py
+    ├── test_lesson04_key.py
+    ├── test_lesson05_key.py
+    └── test_lesson06_key.py
 ```
