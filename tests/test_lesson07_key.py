@@ -89,16 +89,18 @@ def test_koan05_infeasible_always_loses():
 # Koan 06
 # ---------------------------------------------------------------------------
 
-def test_koan06_matchup_deterministic():
-    # seed=0 → sample picks [3, 1]: scores[3]=0 vs scores[1]=-21 → index 1 wins
-    random.seed(0)
-    winner = _tournament_select_matchup(_population, _scores)
-    assert winner == [1, 0, 1, 0, 1, 1, 0, 1]
+def test_koan06_matchup_two_individual_population():
+    # With only 2 individuals, both are always drawn — the better one always wins.
+    pop2  = [[1, 1, 1, 0, 1, 1, 0, 0], [1, 0, 1, 0, 1, 1, 0, 1]]
+    scr2  = [-24, -21]
+    winner = _tournament_select_matchup(pop2, scr2)
+    assert winner == [1, 1, 1, 0, 1, 1, 0, 0]
 
 
 def test_koan06_matchup_length():
-    random.seed(0)
-    winner = _tournament_select_matchup(_population, _scores)
+    pop2  = [[1, 1, 1, 0, 1, 1, 0, 0], [1, 0, 1, 0, 1, 1, 0, 1]]
+    scr2  = [-24, -21]
+    winner = _tournament_select_matchup(pop2, scr2)
     assert len(winner) == 8
 
 

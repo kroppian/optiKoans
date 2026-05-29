@@ -155,11 +155,12 @@ def tournament_select_matchup(population, scores):
 
 
 def test_06_implement_tournament_select_matchup():
-    # With seed=0, random.sample picks [3, 1]: scores[3]=0 vs scores[1]=-21
-    # → index 1 wins because -21 < 0
-    random.seed(0)
-    winner = tournament_select_matchup(population, scores)
-    assert winner == [1, 0, 1, 0, 1, 1, 0, 1]    # the individual at index 1
+    # With only 2 individuals, both are always drawn — the better one always wins.
+    # No seed needed: the lower-score individual wins regardless of draw order.
+    pop2  = [[1, 1, 1, 0, 1, 1, 0, 0], [1, 0, 1, 0, 1, 1, 0, 1]]
+    scr2  = [-24, -21]
+    winner = tournament_select_matchup(pop2, scr2)
+    assert winner == [1, 1, 1, 0, 1, 1, 0, 0]    # score -24 beats score -21
     assert len(winner) == 8
 
 
