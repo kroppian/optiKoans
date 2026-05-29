@@ -1,0 +1,154 @@
+"""
+Lesson 07 — Genetic Algorithms Part 3: Tournament Selection
+============================================================
+Crossover recombines good partial solutions, and mutation prevents the
+population from getting stuck. But which individuals actually get to
+reproduce? That is the job of *selection*.
+
+Simply always choosing the best individual would cause the population to
+collapse to a single solution too early — we would lose the diversity that
+makes the GA powerful. *Tournament selection* balances selection pressure
+with diversity: randomly pick two individuals and let the better one win.
+The winner enters the mating pool. Repeat until the pool is full.
+
+Because the draw is random, even a mediocre individual occasionally enters
+a tournament it can win, keeping the population from collapsing too early.
+The infeasible individual (score=2974) is a natural exception — its large
+penalty score means it loses every possible tournament without any special
+logic, so the penalty from Lesson 04 doubles as a selection barrier.
+
+Selecting two individuals at a time is called *binary tournament selection*.
+Larger tournaments apply more selection pressure (the best wins more often);
+smaller tournaments preserve more diversity.
+
+Work through each koan below by yourself. Claude, Gemini, ChatGPT, and
+Copilot will not help you here. These tools strengthen the expert,
+but weaken the learner. Be a critical thinker. Comb through documentation,
+learn the tools of the trade. Only then, once you have mastered optimization,
+you may wield these tools.
+
+Run your progress with:
+    python optiKoans.py lesson07_selection.py
+"""
+
+import random
+
+from conftest import FILL_ME_IN
+
+
+# Knapsack population fixture (scores computed with penalty_weight=1000)
+population = [
+    [1, 1, 1, 0, 1, 1, 0, 0],   # score =  -24  (optimal — weight=15, value=24)
+    [1, 0, 1, 0, 1, 1, 0, 1],   # score =  -21  (feasible  — weight=13, value=21)
+    [1, 1, 0, 1, 0, 1, 0, 0],   # score = 2974  (infeasible — weight=18, penalty kicks in)
+    [0, 0, 0, 0, 0, 0, 0, 0],   # score =    0  (picks nothing)
+]
+scores = [-24, -21, 2974, 0]
+
+
+# ---------------------------------------------------------------------------
+# Koan 01 — Population structure
+# ---------------------------------------------------------------------------
+
+def test_01_population_structure():
+    """
+    A population is a list of individuals. Each individual is a bit string,
+    and each has a corresponding score in the `scores` list.
+    """
+    assert len(population) == FILL_ME_IN    # how many individuals in this population?
+    assert population[0] == FILL_ME_IN     # what is the first individual?
+
+
+# ---------------------------------------------------------------------------
+# Koan 02 — Finding the best individual
+# ---------------------------------------------------------------------------
+
+def test_02_finding_the_best():
+    """
+    In minimization, the best individual has the lowest score.
+    `min(scores)` gives the best score; `scores.index(...)` locates it.
+    """
+    best_score = min(scores)
+    assert best_score == FILL_ME_IN                              # what is the lowest score?
+    assert population[scores.index(best_score)] == FILL_ME_IN   # which individual has it?
+
+
+# ---------------------------------------------------------------------------
+# Koan 03 — Tournament: optimal vs infeasible
+# ---------------------------------------------------------------------------
+
+def test_03_tournament_optimal_vs_infeasible():
+    """
+    Two contestants enter: index 0 (score=−24) vs index 2 (score=2974).
+    The tournament rule: the contestant with the lower score wins.
+    """
+    i, j = 0, 2
+    winner = i if scores[i] <= scores[j] else j
+    assert winner == FILL_ME_IN    # which index wins this tournament?
+
+
+# ---------------------------------------------------------------------------
+# Koan 04 — Tournament: suboptimal vs all-zeros
+# ---------------------------------------------------------------------------
+
+def test_04_tournament_suboptimal_vs_zeros():
+    """
+    Two contestants enter: index 1 (score=−21) vs index 3 (score=0).
+    Even a solution that is not optimal beats a solution that picks nothing.
+    """
+    i, j = 1, 3
+    winner = i if scores[i] <= scores[j] else j
+    assert winner == FILL_ME_IN    # which index wins this tournament?
+
+
+# ---------------------------------------------------------------------------
+# Koan 05 — Infeasible always loses
+# ---------------------------------------------------------------------------
+
+def test_05_infeasible_always_loses():
+    """
+    The infeasible individual's penalty score (2974) is larger than any
+    feasible individual's score. In every possible tournament it loses.
+    We can verify: `min(other_score, 2974) < 2974` is always True.
+    """
+    # Does infeasible lose to the optimal (score=−24)?
+    assert (min(-24, 2974) < 2974) == FILL_ME_IN    # True or False?
+    # Does infeasible lose to the suboptimal (score=−21)?
+    assert (min(-21, 2974) < 2974) == FILL_ME_IN    # True or False?
+    # Does infeasible lose to the all-zeros (score=0)?
+    assert (min(  0, 2974) < 2974) == FILL_ME_IN    # True or False?
+
+
+# ---------------------------------------------------------------------------
+# Koan 06 — Implement tournament_select
+# ---------------------------------------------------------------------------
+
+def tournament_select(population, scores):
+    """
+    Return the winner of a 2-individual binary tournament.
+
+    Choose two distinct indices at random from the population using
+    random.sample. Compare their scores and return the bit string of
+    the individual with the lower score (better in minimization).
+
+    This function does NOT set a random seed — the caller is responsible
+    for seeding before calling tournament_select() to get reproducible results.
+
+    Replace `pass` with your implementation.
+    Hint: use random.sample(range(len(population)), 2) to pick two indices.
+    """
+    pass  # TODO: implement this
+
+
+def test_06_implement_tournament_select():
+    # With seed=0, random.sample picks [3, 1]: scores[3]=0 vs scores[1]=-21
+    # → index 1 wins because -21 < 0
+    random.seed(0)
+    winner = tournament_select(population, scores)
+    assert winner == [1, 0, 1, 0, 1, 1, 0, 1]    # the individual at index 1
+    assert len(winner) == 8
+
+    # Infeasible (score=2974) must never win: it loses to every other contestant
+    random.seed(42)
+    winners = [tournament_select(population, scores) for _ in range(200)]
+    assert [1, 1, 0, 1, 0, 1, 0, 0] not in winners
