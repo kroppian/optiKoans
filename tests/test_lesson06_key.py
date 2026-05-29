@@ -10,20 +10,31 @@ import random
 
 
 # ---------------------------------------------------------------------------
-# Reference implementation (answer to koan 06)
+# Reference implementations (answers to koans 01 and 06)
 # ---------------------------------------------------------------------------
 
+def _flip_bit(bit):
+    assert bit in (0, 1), f"flip_bit expects 0 or 1, got {bit!r}"
+    return 1 - bit
+
+
 def _mutate(bits, mutation_rate):
-    return [1 - b if random.random() < mutation_rate else b for b in bits]
+    return [_flip_bit(b) if random.random() < mutation_rate else b for b in bits]
 
 
 # ---------------------------------------------------------------------------
 # Koan 01
 # ---------------------------------------------------------------------------
 
-def test_koan01_flipping_a_bit():
-    assert 1 - 1 == 0
-    assert 1 - 0 == 1
+def test_koan01_flip_bit():
+    assert _flip_bit(1) == 0
+    assert _flip_bit(0) == 1
+
+
+def test_koan01_flip_bit_rejects_invalid():
+    import pytest
+    with pytest.raises(AssertionError):
+        _flip_bit(2)
 
 
 # ---------------------------------------------------------------------------
@@ -43,7 +54,7 @@ def test_koan02_random_trial():
 def test_koan03_mutate_a_genome():
     genome = [1, 0, 1, 0, 1, 0, 1, 0]
     random.seed(0)
-    mutated = [1 - b if random.random() < 0.5 else b for b in genome]
+    mutated = [_flip_bit(b) if random.random() < 0.5 else b for b in genome]
     assert mutated == [1, 0, 0, 1, 1, 1, 1, 1]
 
 
@@ -54,7 +65,7 @@ def test_koan03_mutate_a_genome():
 def test_koan04_length_is_preserved():
     genome = [1, 0, 1, 0, 1, 0, 1, 0]
     random.seed(0)
-    mutated = [1 - b if random.random() < 0.5 else b for b in genome]
+    mutated = [_flip_bit(b) if random.random() < 0.5 else b for b in genome]
     assert len(mutated) == 8
 
 
@@ -64,7 +75,7 @@ def test_koan04_length_is_preserved():
 
 def test_koan05_rate_one_flips_everything():
     genome  = [1, 0, 1, 0, 1, 0, 1, 0]
-    mutated = [1 - b if random.random() < 1.0 else b for b in genome]
+    mutated = [_flip_bit(b) if random.random() < 1.0 else b for b in genome]
     assert mutated == [0, 1, 0, 1, 0, 1, 0, 1]
 
 

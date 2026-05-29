@@ -35,16 +35,28 @@ from conftest import FILL_ME_IN
 
 
 # ---------------------------------------------------------------------------
-# Koan 01 — Flipping a single bit
+# Koan 01 — Implement flip_bit
 # ---------------------------------------------------------------------------
 
-def test_01_flipping_a_bit():
+def flip_bit(bit):
     """
-    A bit can only be 0 or 1. Flipping it means switching from one to the
-    other. The expression (1 - bit) handles both cases cleanly.
+    Flip a single binary bit: 1 → 0, 0 → 1.
+    Raises AssertionError if bit is not exactly 0 or 1 — this protects
+    the rest of the GA from accidentally processing corrupted genomes.
+
+    Replace `pass` with your implementation.
+    Hint: assert bit in (0, 1), then return 1 - bit.
     """
-    assert 1 - 1 == FILL_ME_IN   # flip a 1 → ?
-    assert 1 - 0 == FILL_ME_IN   # flip a 0 → ?
+
+    assert bit in (0, 1), f"flip_bit expects 0 or 1, got {bit!r}"
+
+    pass  # TODO: implement this
+
+
+def test_01_flip_bit():
+    """flip_bit converts 1 to 0 and 0 to 1. Any other input raises AssertionError."""
+    assert flip_bit(1) == FILL_ME_IN   # flip a 1 → ?
+    assert flip_bit(0) == FILL_ME_IN   # flip a 0 → ?
 
 
 # ---------------------------------------------------------------------------
@@ -76,7 +88,7 @@ def test_03_mutate_a_genome():
     genome = [1, 0, 1, 0, 1, 0, 1, 0]
 
     random.seed(0)
-    mutated = [1 - b if random.random() < 0.5 else b for b in genome]
+    mutated = [flip_bit(b) if random.random() < 0.5 else b for b in genome]
 
     assert mutated == FILL_ME_IN
 
@@ -93,7 +105,7 @@ def test_04_length_is_preserved():
     genome = [1, 0, 1, 0, 1, 0, 1, 0]
 
     random.seed(0)
-    mutated = [1 - b if random.random() < 0.5 else b for b in genome]
+    mutated = [flip_bit(b) if random.random() < 0.5 else b for b in genome]
 
     assert len(mutated) == FILL_ME_IN
 
@@ -109,7 +121,7 @@ def test_05_rate_one_flips_everything():
     Every bit flips — the result is the bitwise complement of the genome.
     """
     genome  = [1, 0, 1, 0, 1, 0, 1, 0]
-    mutated = [1 - b if random.random() < 1.0 else b for b in genome]
+    mutated = [flip_bit(b) if random.random() < 1.0 else b for b in genome]
 
     assert mutated == FILL_ME_IN
 
@@ -127,7 +139,7 @@ def mutate(bits, mutation_rate):
     for seeding before calling mutate() to get reproducible results.
 
     Replace `pass` with your implementation.
-    Hint: use a list comprehension with random.random() and (1 - b).
+    Hint: use a list comprehension with random.random() and flip_bit.
     """
     pass  # TODO: implement this
 
