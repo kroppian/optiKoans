@@ -1,10 +1,12 @@
 """
 Lesson 06 — Genetic Algorithms Part 2: Mutation
 =================================================
-Crossover recombines material that already exists in the population.
-But what happens when every individual in the population has a 0 in
-position 3? No amount of crossover can ever produce a 1 there —
-the population is stuck.
+So far, we have learned two building blocks of genetic algorithms: 
+a Monte Carlo generation of random points, which we can then 
+recombine the best solutions of with crossover to (hopefully) create
+better solutions. However, what happens when every individual in the population 
+has a 0 in position 3? No amount of crossover can ever produce a 1 there —
+the population is stuck, and optimization halts. 
 
 *Mutation* fixes this. After crossover, each bit in a child is
 independently flipped with a small probability called the *mutation rate*.
@@ -12,7 +14,7 @@ This injects fresh genetic diversity, letting the search escape local
 optima and explore parts of the space the population has never visited.
 
 The mutation rate is a trade-off:
-  • Too low  → population converges prematurely, can get stuck
+  • Too low  → population converges on an local optima prematurely, can get stuck
   • Too high → search becomes random, ignores what was already learned
 
 A typical rate for an 8-bit genome is 1/8 ≈ 0.125 (flip roughly one bit).
