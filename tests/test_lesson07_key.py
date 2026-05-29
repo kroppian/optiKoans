@@ -23,13 +23,17 @@ _scores = [-24, -21, 2974, 0]
 
 
 # ---------------------------------------------------------------------------
-# Reference implementation
+# Reference implementations
 # ---------------------------------------------------------------------------
 
-def _tournament_select(population, scores):
+def _tournament_select_matchup(population, scores):
     i, j = random.sample(range(len(population)), 2)
     winner = i if scores[i] <= scores[j] else j
     return population[winner]
+
+
+def _tournament_select(population, scores, n):
+    return [_tournament_select_matchup(population, scores) for _ in range(n)]
 
 
 # ---------------------------------------------------------------------------
@@ -85,19 +89,39 @@ def test_koan05_infeasible_always_loses():
 # Koan 06
 # ---------------------------------------------------------------------------
 
-def test_koan06_tournament_select_deterministic():
+def test_koan06_matchup_deterministic():
     # seed=0 → sample picks [3, 1]: scores[3]=0 vs scores[1]=-21 → index 1 wins
     random.seed(0)
-    assert _tournament_select(_population, _scores) == [1, 0, 1, 0, 1, 1, 0, 1]
+    winner = _tournament_select_matchup(_population, _scores)
+    assert winner == [1, 0, 1, 0, 1, 1, 0, 1]
 
 
-def test_koan06_tournament_select_length():
+def test_koan06_matchup_length():
     random.seed(0)
-    winner = _tournament_select(_population, _scores)
+    winner = _tournament_select_matchup(_population, _scores)
     assert len(winner) == 8
 
 
-def test_koan06_infeasible_never_wins():
+# ---------------------------------------------------------------------------
+# Koan 07
+# ---------------------------------------------------------------------------
+
+def test_koan07_tournament_select_length():
+    random.seed(0)
+    selected = _tournament_select(_population, _scores, n=200)
+    assert len(selected) == 200
+
+
+def test_koan07_tournament_select_mean_improves():
+    mean_original = sum(_scores) / len(_scores)   # 732.25
+    random.seed(0)
+    selected = _tournament_select(_population, _scores, n=200)
+    selected_scores = [_scores[_population.index(w)] for w in selected]
+    mean_selected = sum(selected_scores) / len(selected_scores)
+    assert mean_selected < mean_original
+
+
+def test_koan07_infeasible_never_wins():
     random.seed(42)
-    winners = [_tournament_select(_population, _scores) for _ in range(200)]
-    assert [1, 1, 0, 1, 0, 1, 0, 0] not in winners
+    selected = _tournament_select(_population, _scores, n=200)
+    assert [1, 1, 0, 1, 0, 1, 0, 0] not in selected

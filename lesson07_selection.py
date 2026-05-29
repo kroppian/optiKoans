@@ -134,19 +134,19 @@ def test_05_infeasible_always_loses():
 
 
 # ---------------------------------------------------------------------------
-# Koan 06 — Implement tournament_select
+# Koan 06 — Implement tournament_select_matchup
 # ---------------------------------------------------------------------------
 
-def tournament_select(population, scores):
+def tournament_select_matchup(population, scores):
     """
-    Return the winner of a 2-individual binary tournament.
+    Run a single 2-individual binary tournament.
 
     Choose two distinct indices at random from the population using
     random.sample. Compare their scores and return the bit string of
     the individual with the lower score (better in minimization).
 
     This function does NOT set a random seed — the caller is responsible
-    for seeding before calling tournament_select() to get reproducible results.
+    for seeding before calling tournament_select_matchup() for reproducible results.
 
     Replace `pass` with your implementation.
     Hint: use random.sample(range(len(population)), 2) to pick two indices.
@@ -154,15 +154,45 @@ def tournament_select(population, scores):
     pass  # TODO: implement this
 
 
-def test_06_implement_tournament_select():
+def test_06_implement_tournament_select_matchup():
     # With seed=0, random.sample picks [3, 1]: scores[3]=0 vs scores[1]=-21
     # → index 1 wins because -21 < 0
     random.seed(0)
-    winner = tournament_select(population, scores)
+    winner = tournament_select_matchup(population, scores)
     assert winner == [1, 0, 1, 0, 1, 1, 0, 1]    # the individual at index 1
     assert len(winner) == 8
 
-    # Infeasible (score=2974) must never win: it loses to every other contestant
-    random.seed(42)
-    winners = [tournament_select(population, scores) for _ in range(200)]
-    assert [1, 1, 0, 1, 0, 1, 0, 0] not in winners
+
+# ---------------------------------------------------------------------------
+# Koan 07 — Implement tournament_select
+# ---------------------------------------------------------------------------
+
+def tournament_select(population, scores, n):
+    """
+    Build a mating pool of n individuals by running n independent
+    binary tournaments. Each call to tournament_select_matchup adds one winner.
+
+    This function does NOT set a random seed — the caller is responsible
+    for seeding before calling tournament_select() for reproducible results.
+
+    Replace `pass` with your implementation.
+    Hint: use a list comprehension that calls tournament_select_matchup n times.
+    """
+    pass  # TODO: implement this
+
+
+def test_07_implement_tournament_select():
+    """
+    Selection pressure: the mean score of the selected pool should be
+    lower (better) than the mean score of the original population, because
+    good individuals win tournaments more often than bad ones.
+    """
+    mean_original = sum(scores) / len(scores)   # = (-24 + -21 + 2974 + 0) / 4 = 732.25
+
+    random.seed(0)
+    selected = tournament_select(population, scores, n=200)
+    selected_scores = [scores[population.index(w)] for w in selected]
+    mean_selected = sum(selected_scores) / len(selected_scores)
+
+    assert len(selected) == 200                  # must return exactly n individuals
+    assert mean_selected < mean_original         # selection pressure improves the pool
