@@ -1,21 +1,34 @@
 """
 Lesson 07 — Genetic Algorithms Part 3: Tournament Selection
 ============================================================
-Crossover recombines good partial solutions, and mutation prevents the
-population from getting stuck. But which individuals actually get to
-reproduce? That is the job of *selection*.
+Time to start putting things together! Moving forward, we're going to be 
+optimizing *populations* of solutions, instead of just one or two solutions. 
+Genetic algorithm will typically have tens or hundreds of members of a 
+popluation, which will be gradually evolved over many generations. Having so many 
+solutions, which are initially generated at random in a Monte Carlo simluation, 
+allows us to increase our odds of finding optimal solutions, while keeping a 
+diverse set of solutions to avoid local optima. 
 
-Simply always choosing the best individual would cause the population to
-collapse to a single solution too early — we would lose the diversity that
+The main pressure that drives a popluation to increasingly better solutions 
+is selection. Good solutions are chosen, recombined, mutated, and they 
+and their children cotinue to the next generation. Bad solutions are left in 
+the fossil record. But how do we select the appropriate solutions for survival? 
+Simply always choosing the best n individuals would cause the population to
+converge to a single solution too early — we would lose the diversity that
 makes the GA powerful. *Tournament selection* balances selection pressure
 with diversity: randomly pick two individuals and let the better one win.
 The winner enters the mating pool. Repeat until the pool is full.
 
 Because the draw is random, even a mediocre individual occasionally enters
-a tournament it can win, keeping the population from collapsing too early.
-The infeasible individual (score=2974) is a natural exception — its large
-penalty score means it loses every possible tournament without any special
-logic, so the penalty from Lesson 04 doubles as a selection barrier.
+a tournament it can win, keeping the population from converging too early.
+The infeasible individual is a natural exception — its large
+objective value, penalized by because of its infeasibility, means it loses 
+every possible tournament without any special
+logic, so the penalty from Lesson 04 doubles as a selection barrier. However,
+if we have many infeasible solutions (e.g., half of the popluation is 
+infeasible), they may survive the selection. This allows the algorithm to 
+explore largely infeasible spaces and stumble upon optimal solutions, while 
+still penalizing infeasibility overall.
 
 Selecting two individuals at a time is called *binary tournament selection*.
 Larger tournaments apply more selection pressure (the best wins more often);
@@ -38,8 +51,8 @@ from conftest import FILL_ME_IN
 
 # Knapsack population fixture (scores computed with penalty_weight=1000)
 population = [
-    [1, 1, 1, 0, 1, 1, 0, 0],   # score =  -24  (optimal — weight=15, value=24)
-    [1, 0, 1, 0, 1, 1, 0, 1],   # score =  -21  (feasible  — weight=13, value=21)
+    [1, 1, 1, 0, 1, 1, 0, 0],   # score =  -24  (optimal    — weight=15, value=24)
+    [1, 0, 1, 0, 1, 1, 0, 1],   # score =  -21  (feasible   — weight=13, value=21)
     [1, 1, 0, 1, 0, 1, 0, 0],   # score = 2974  (infeasible — weight=18, penalty kicks in)
     [0, 0, 0, 0, 0, 0, 0, 0],   # score =    0  (picks nothing)
 ]
@@ -55,8 +68,8 @@ def test_01_population_structure():
     A population is a list of individuals. Each individual is a bit string,
     and each has a corresponding score in the `scores` list.
     """
-    assert len(population) == FILL_ME_IN    # how many individuals in this population?
-    assert population[0] == FILL_ME_IN     # what is the first individual?
+    assert len(population) == FILL_ME_IN   # how many individuals in this population?
+    assert population[0]   == FILL_ME_IN   # what is the first individual?
 
 
 # ---------------------------------------------------------------------------
@@ -69,7 +82,7 @@ def test_02_finding_the_best():
     `min(scores)` gives the best score; `scores.index(...)` locates it.
     """
     best_score = min(scores)
-    assert best_score == FILL_ME_IN                              # what is the lowest score?
+    assert best_score == FILL_ME_IN                             # what is the lowest score?
     assert population[scores.index(best_score)] == FILL_ME_IN   # which individual has it?
 
 
@@ -108,7 +121,8 @@ def test_04_tournament_suboptimal_vs_zeros():
 def test_05_infeasible_always_loses():
     """
     The infeasible individual's penalty score (2974) is larger than any
-    feasible individual's score. In every possible tournament it loses.
+    feasible individual's score. In every possible match-up with a 
+    feasible solution, it will loose. 
     We can verify: `min(other_score, 2974) < 2974` is always True.
     """
     # Does infeasible lose to the optimal (score=−24)?
