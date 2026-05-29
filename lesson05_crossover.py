@@ -45,8 +45,8 @@ def test_01_splitting_at_crossover_point():
     genome = [1, 0, 1, 1, 0, 1, 0, 0]
     point  = 4
 
-    assert genome[:point] == FILL_ME_IN   # what is the head?
-    assert genome[point:] == FILL_ME_IN   # what is the tail?
+    assert genome[:point] == [1, 0, 1, 1]   # what is the head?
+    assert genome[point:] == [0, 1, 0, 0]  # what is the tail?
 
 
 # ---------------------------------------------------------------------------
@@ -64,7 +64,7 @@ def test_02_first_child():
     point   = 4
 
     child1 = parent1[:point] + parent2[point:]
-    assert child1 == FILL_ME_IN
+    assert child1 == [1, 0, 1, 1, 1, 0, 1, 1]
 
 
 # ---------------------------------------------------------------------------
@@ -81,7 +81,7 @@ def test_03_second_child():
     point   = 4
 
     child2 = parent2[:point] + parent1[point:]
-    assert child2 == FILL_ME_IN
+    assert child2 == [0, 1, 0, 0, 0, 1, 0, 0]
 
 
 # ---------------------------------------------------------------------------
@@ -100,8 +100,8 @@ def test_04_children_preserve_length():
     child1 = parent1[:point] + parent2[point:]
     child2 = parent2[:point] + parent1[point:]
 
-    assert len(child1) == FILL_ME_IN
-    assert len(child2) == FILL_ME_IN
+    assert len(child1) == 8
+    assert len(child2) == 8
 
 
 # ---------------------------------------------------------------------------
@@ -118,7 +118,7 @@ def test_05_crossover_at_zero():
     point   = 0
 
     child1 = parent1[:point] + parent2[point:]
-    assert child1 == FILL_ME_IN   # which parent does child1 equal at point=0?
+    assert child1 == [0, 1, 0, 0, 1, 0, 1, 1]   # which parent does child1 equal at point=0?
 
 
 # ---------------------------------------------------------------------------
@@ -135,7 +135,10 @@ def crossover(parent1, parent2, point):
     Replace `pass` with your implementation.
     Hint: use list slicing with [:point] and [point:], and the + operator.
     """
-    pass  # TODO: implement this
+    child1 = parent1[:point] + parent2[point:]
+    child2 = parent2[:point] + parent1[point:]
+
+    return (child1, child2)
 
 
 def test_06_implement_crossover():
