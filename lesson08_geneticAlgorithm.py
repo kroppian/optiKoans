@@ -68,8 +68,10 @@ def test_01_initialize_population():
 
     assert len(pop) == FILL_ME_IN                                     # how many individuals?
     assert len(pop[0]) == FILL_ME_IN                                  # how long is each genome?
-    # TODO test if they aren't all just zeros or not all ones
     assert all(b in (0, 1) for ind in pop for b in ind) == FILL_ME_IN  # all bits valid?
+    all_bits = [b for ind in pop for b in ind]
+    assert (0 in all_bits) == FILL_ME_IN   # does 0 appear? (not all-ones)
+    assert (1 in all_bits) == FILL_ME_IN   # does 1 appear? (not all-zeros)
 
 
 # ---------------------------------------------------------------------------
@@ -126,8 +128,8 @@ def test_03_penalty():
 # ---------------------------------------------------------------------------
 # Koan 04 — Tournament selection
 # ---------------------------------------------------------------------------
-# TODO this should be tournament_select_matchup to be consistent with lesson07
-def tournament_select(population, scores):
+
+def tournament_select_matchup(population, scores):
     """
     Return the winner of a 2-individual binary tournament.
 
@@ -142,11 +144,11 @@ def tournament_select(population, scores):
     pass  # TODO: implement this
 
 
-def test_04_tournament_select():
+def test_04_tournament_select_matchup():
     # With exactly 2 individuals, both are always drawn — the better one always wins.
     pop2  = [[1, 1, 1, 0, 1, 1, 0, 0], [1, 0, 1, 0, 1, 1, 0, 1]]
     scr2  = [-24, -21]
-    winner = tournament_select(pop2, scr2)
+    winner = tournament_select_matchup(pop2, scr2)
     assert winner == FILL_ME_IN    # which individual has the lower score?
     assert len(winner) == FILL_ME_IN
 
@@ -238,34 +240,23 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
                    + penalty(ind, weights, capacity)
       4. Set n_elites = pop_size // 10
       5. For each generation:
-           a. Elitism — carry the best n_elites individuals forward unchanged:
-                  elite_pairs = sorted(zip(scores, population))[:n_elites]
-                  elites = [ind for _, ind in elite_pairs]
+           a. Elitism — identify and preserve the best individuals:
+                  Sort individuals by score and take the top n_elites as elites
 
-           b. Selection — build a mating pool of pop_size winners
-              using two rounds of shuffle-and-pair tournaments:
-                  mating_pool = []
-                  # TODO this not pseudocode, it's python. Make it 1) human language, and b) more vague
-                  for each of 2 rounds:
-                      combined = list(zip(population, scores))
-                      random.shuffle(combined)
-                      for k in range(0, pop_size, 2):
-                          (ind1, sc1), (ind2, sc2) = combined[k], combined[k+1]
-                          mating_pool.append(ind1 if sc1 <= sc2 else ind2)
+           b. Selection — build a mating pool of pop_size winners:
+                  Do the following twice:
+                      Randomly shuffle the current population (keeping scores aligned)
+                      Walk through the shuffled list in adjacent pairs
+                      For each pair, the individual with the lower score wins
+                      Add each winner to the mating pool
 
-           c. Reproduction — fill (pop_size - n_elites) child slots from the mating pool:
-                  random.shuffle(mating_pool)
-                  children = []
-                  k = 0
-                  while len(children) < pop_size - n_elites:
-                      child1, child2 = crossover(mating_pool[k], mating_pool[k+1])
-                      children.append(mutate(child1, mutation_rate))
-                      if len(children) < pop_size - n_elites:
-                          children.append(mutate(child2, mutation_rate))
-                      k += 2
+           c. Reproduction — fill (pop_size - n_elites) child slots:
+                  Randomly shuffle the mating pool and walk through adjacent pairs
+                  For each pair, apply crossover to produce two children, then mutate each
+                  Stop once you have enough children to fill the generation
                   population = elites + children
 
-           d. Check if we've hit the maximum population
+           d. Re-evaluate the new population (same formula as step 3)
 
       6. Return the best individual from the final population:
              _, best_ind = min(zip(scores, population))
