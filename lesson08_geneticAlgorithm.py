@@ -16,6 +16,7 @@ compute budget.
 The GA loop:
   1. *Initialize* a random population of N bit strings of length d.
   2. *Evaluate* every individual: objective + constraint penalty .
+  3. Choose best 10% of the solutions to automatically go to next generation
   3. *Select* parents to form the mating pool with N members
   4. *Recombine* a randomly selected pair of two members of the mating pool
   5. *Mutate* each child to maintain diversity at a certain rate
@@ -67,6 +68,7 @@ def test_01_initialize_population():
 
     assert len(pop) == FILL_ME_IN                                     # how many individuals?
     assert len(pop[0]) == FILL_ME_IN                                  # how long is each genome?
+    # TODO test if they aren't all just zeros or not all ones
     assert all(b in (0, 1) for ind in pop for b in ind) == FILL_ME_IN  # all bits valid?
 
 
@@ -124,7 +126,7 @@ def test_03_penalty():
 # ---------------------------------------------------------------------------
 # Koan 04 — Tournament selection
 # ---------------------------------------------------------------------------
-
+# TODO this should be tournament_select_matchup to be consistent with lesson07
 def tournament_select(population, scores):
     """
     Return the winner of a 2-individual binary tournament.
@@ -223,7 +225,9 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
            mutation_rate=0.125, seed=0):
     """
     Run a genetic algorithm to minimize the penalized knapsack objective.
-    Returns the best bit string found across all generations.
+    Returns the best individual from the final generation.
+
+    pop_size must be even (individuals are paired for selection and crossover).
 
     Pseudocode — fill in each step:
       1. Seed the RNG with `seed`
@@ -232,31 +236,49 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
       3. Evaluate every individual:
              score = objective(ind, weights, values)
                    + penalty(ind, weights, capacity)
-      4. Track the all-time best:
-             best_score, best_ind = min(zip(scores, population))
+      4. Set n_elites = pop_size // 10
       5. For each generation:
-           a. Build a new population of pop_size individuals:
-                  new_pop = []
-                  while len(new_pop) < pop_size:
-                      parent1 = tournament_select(population, scores)
-                      parent2 = tournament_select(population, scores)
-                      child1, child2 = crossover(parent1, parent2)
-                      new_pop.append(mutate(child1, mutation_rate))
-                      new_pop.append(mutate(child2, mutation_rate))
-                  population = new_pop[:pop_size]
-           b. Re-evaluate the new population (same formula as step 3)
-           c. Update the all-time best if this generation improved it:
-                  gen_best_score, gen_best_ind = min(zip(scores, population))
-                  if gen_best_score < best_score:
-                      best_score, best_ind = gen_best_score, gen_best_ind
-      6. Return best_ind
+           a. Elitism — carry the best n_elites individuals forward unchanged:
+                  elite_pairs = sorted(zip(scores, population))[:n_elites]
+                  elites = [ind for _, ind in elite_pairs]
+
+           b. Selection — build a mating pool of pop_size winners
+              using two rounds of shuffle-and-pair tournaments:
+                  mating_pool = []
+                  # TODO this not pseudocode, it's python. Make it 1) human language, and b) more vague
+                  for each of 2 rounds:
+                      combined = list(zip(population, scores))
+                      random.shuffle(combined)
+                      for k in range(0, pop_size, 2):
+                          (ind1, sc1), (ind2, sc2) = combined[k], combined[k+1]
+                          mating_pool.append(ind1 if sc1 <= sc2 else ind2)
+
+           c. Reproduction — fill (pop_size - n_elites) child slots from the mating pool:
+                  random.shuffle(mating_pool)
+                  children = []
+                  k = 0
+                  while len(children) < pop_size - n_elites:
+                      child1, child2 = crossover(mating_pool[k], mating_pool[k+1])
+                      children.append(mutate(child1, mutation_rate))
+                      if len(children) < pop_size - n_elites:
+                          children.append(mutate(child2, mutation_rate))
+                      k += 2
+                  population = elites + children
+
+           d. Check if we've hit the maximum population
+
+      6. Return the best individual from the final population:
+             _, best_ind = min(zip(scores, population))
+             return best_ind
     """
     pass  # TODO: implement this
 
 
 def test_07_run_ga():
-    # 50 generations of 50 individuals reliably finds the optimal solution.
-    # Optimal: [1,1,1,0,1,1,0,0] → weight=15, value=24, score=−24
+    """
+    With 10% elitism, the GA reliably finds the optimal knapsack solution.
+    Optimal: [1,1,1,0,1,1,0,0] — weight=15, value=24, score=−24.
+    """
     result = run_ga(weights, values, capacity, pop_size=50, n_generations=50,
                     mutation_rate=0.125, seed=0)
     assert result == [1, 1, 1, 0, 1, 1, 0, 0]

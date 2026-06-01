@@ -56,21 +56,33 @@ def _run_ga(weights, values, capacity, pop_size=50, n_generations=50,
     population = _initialize_population(pop_size, genome_length)
     scores = [_objective(ind, weights, values) + _penalty(ind, weights, capacity)
               for ind in population]
-    best_score, best_ind = min(zip(scores, population))
+    n_elites = pop_size // 10
     for _ in range(n_generations):
-        new_pop = []
-        while len(new_pop) < pop_size:
-            p1 = _tournament_select(population, scores)
-            p2 = _tournament_select(population, scores)
-            c1, c2 = _crossover(p1, p2)
-            new_pop.append(_mutate(c1, mutation_rate))
-            new_pop.append(_mutate(c2, mutation_rate))
-        population = new_pop[:pop_size]
+        # Elitism: carry forward the best n_elites individuals unchanged
+        elite_pairs = sorted(zip(scores, population))[:n_elites]
+        elites = [ind for _, ind in elite_pairs]
+        # Selection: two rounds of shuffle-and-pair tournaments → mating pool of N
+        mating_pool = []
+        for _round in range(2):
+            combined = list(zip(population, scores))
+            random.shuffle(combined)
+            for k in range(0, pop_size, 2):
+                (ind1, sc1), (ind2, sc2) = combined[k], combined[k + 1]
+                mating_pool.append(ind1 if sc1 <= sc2 else ind2)
+        # Reproduction: fill (pop_size - n_elites) child slots from shuffled mating pool
+        random.shuffle(mating_pool)
+        children = []
+        k = 0
+        while len(children) < pop_size - n_elites:
+            c1, c2 = _crossover(mating_pool[k], mating_pool[k + 1])
+            children.append(_mutate(c1, mutation_rate))
+            if len(children) < pop_size - n_elites:
+                children.append(_mutate(c2, mutation_rate))
+            k += 2
+        population = elites + children
         scores = [_objective(ind, weights, values) + _penalty(ind, weights, capacity)
                   for ind in population]
-        gen_best_score, gen_best_ind = min(zip(scores, population))
-        if gen_best_score < best_score:
-            best_score, best_ind = gen_best_score, gen_best_ind
+    _, best_ind = min(zip(scores, population))
     return best_ind
 
 
@@ -199,8 +211,7 @@ def test_koan07_run_ga_finds_optimal():
 
 
 def test_koan07_run_ga_robust_across_seeds():
-    # Multiple seeds should all converge to the optimal
-    for seed in [7, 42, 99]:
+    for seed in [1, 7, 42, 99]:
         result = _run_ga(_weights, _values, _capacity, pop_size=50, n_generations=50,
                          mutation_rate=0.125, seed=seed)
         assert result == [1, 1, 1, 0, 1, 1, 0, 0], f"seed={seed} failed"
