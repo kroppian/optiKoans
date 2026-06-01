@@ -16,6 +16,7 @@ each lesson is a Python file full of tests that fail until you fill them in.
 | `lesson05_crossover.py` | Genetic Algorithms Part 1: single-point crossover |
 | `lesson06_mutation.py` | Genetic Algorithms Part 2: bit-flip mutation |
 | `lesson07_selection.py` | Genetic Algorithms Part 3: tournament selection |
+| `lesson08_geneticAlgorithm.py` | Genetic Algorithms Part 4: the complete GA |
 
 ---
 
@@ -91,6 +92,7 @@ Optimization-Koans/
 ├── lesson05_crossover.py
 ├── lesson06_mutation.py
 ├── lesson07_selection.py
+├── lesson08_geneticAlgorithm.py
 └── tests/
     ├── test_lesson00_key.py
     ├── test_lesson01_key.py
@@ -99,5 +101,6 @@ Optimization-Koans/
     ├── test_lesson04_key.py
     ├── test_lesson05_key.py
     ├── test_lesson06_key.py
-    └── test_lesson07_key.py
+    ├── test_lesson07_key.py
+    └── test_lesson08_key.py
 ```
