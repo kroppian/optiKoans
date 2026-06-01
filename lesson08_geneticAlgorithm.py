@@ -8,23 +8,21 @@ Over the last four lessons you built every piece of a genetic algorithm:
   Lesson 06 — bit-flip mutation
   Lesson 07 — tournament selection
 
-Now you assemble those pieces into a complete GA that reliably finds the
-*optimal* solution to the knapsack problem — a solution neither brute force
-nor Monte Carlo can match within a reasonable compute budget.
+Now you assemble those pieces into a complete GA that reliably finds 
+near-optimal (or sometimes globally optimal!) solution to the knapsack problem —
+a solution neither brute force nor Monte Carlo can match within a reasonable 
+compute budget.
 
 The GA loop:
-  1. *Initialize* a random population of bit strings.
-  2. *Evaluate* every individual: objective + constraint penalty.
-  3. *Select* two parents by tournament selection.
-  4. *Recombine* them with crossover to produce two children.
-  5. *Mutate* each child to maintain diversity.
-  6. Repeat steps 3–5 until you have a new population of the same size.
-  7. *Keep the all-time best* (elitism) across all generations.
-  8. Return the best individual found.
+  1. *Initialize* a random population of N bit strings of length d.
+  2. *Evaluate* every individual: objective + constraint penalty .
+  3. *Select* parents to form the mating pool with N members
+  4. *Recombine* a randomly selected pair of two members of the mating pool
+  5. *Mutate* each child to maintain diversity at a certain rate
+  6. Repeat steps 4 and 5 until you have a new population of size N
+  7. If you've hit the stopping criteria, go to step 8, else go to step 2
+  8. Choose the bes solution from the population
 
-On the 8-item knapsack, 50 generations of 50 individuals reliably finds
-the optimal solution — weight=15, value=24 — that brute force would need
-256 evaluations to guarantee.
 
 Work through each koan below by yourself. Claude, Gemini, ChatGPT, and
 Copilot will not help you here. These tools strengthen the expert,
