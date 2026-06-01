@@ -29,6 +29,8 @@ Optimization-Koans/
 ├── lesson04_binaryEncoding.py
 ├── lesson05_crossover.py
 ├── lesson06_mutation.py
+├── lesson07_selection.py
+├── lesson08_geneticAlgorithm.py
 └── tests/
     ├── test_platform.py          # runner + sentinel regression tests
     ├── test_lesson00_key.py      # answer key for lesson 00
@@ -37,7 +39,9 @@ Optimization-Koans/
     ├── test_lesson03_key.py      # answer key for lesson 03
     ├── test_lesson04_key.py      # answer key for lesson 04
     ├── test_lesson05_key.py      # answer key for lesson 05
-    └── test_lesson06_key.py      # answer key for lesson 06
+    ├── test_lesson06_key.py      # answer key for lesson 06
+    ├── test_lesson07_key.py      # answer key for lesson 07
+    └── test_lesson08_key.py      # answer key for lesson 08
 ```
 
 ---
@@ -48,7 +52,7 @@ Optimization-Koans/
 - `python optiKoans.py lesson00_finding_good_answers.py` — single file verbose run
 
 **Regression suite:**
-- `pytest tests/` — runs 70 regression tests (answer keys + platform tests); all should pass on a clean checkout
+- `pytest tests/` — runs 97 regression tests (answer keys + platform tests); all should pass on a clean checkout
 - Do NOT run bare `pytest` (no args) — it will try to collect lesson files too
 
 ---
@@ -104,7 +108,8 @@ Planned arc: brute force → stochastic search → guided stochastic (GA) → gr
 - `lesson04` — binary encoding; 8-item knapsack as running example; bit strings, weight/value from `zip`, feasibility, penalized objective; implement `knapsack_score(bits, weights, values, capacity, penalty_weight=1000)`
 - `lesson05` — GA Part 1: single-point crossover; why crossover recombines good partial solutions; slice syntax; boundary cases; implement `crossover(parent1, parent2, point) → (child1, child2)`
 - `lesson06` — GA Part 2: bit-flip mutation; why mutation maintains diversity; `flip_bit(bit)` helper (asserts 0 or 1); mutation rate trade-off; implement `mutate(bits, mutation_rate)` — no seed, caller manages state
-- **TODO:** `lesson07` — selection (tournament); `lesson08` — full GA
+- `lesson07` — GA Part 3: tournament selection; binary tournament; `tournament_select_matchup(population, scores)` returns the winner of one 2-way draw; `tournament_select(population, scores, n)` builds a mating pool of n winners; mean-score test confirms selection pressure
+- `lesson08` — GA Part 4: the complete GA; students re-implement all components from scratch (initialize population, objective, penalty, tournament matchup, crossover with internal random point, mutation); final `run_ga` uses 10% elitism + two-round shuffle-and-pair selection; finds optimal `[1,1,1,0,1,1,0,0]` for seed=0 with pop_size=50, n_generations=50
 
 **Central knapsack fixture (lessons 04–08):**
 ```python
