@@ -15,6 +15,7 @@ each lesson is a Python file full of tests that fail until you fill them in.
 | `lesson04_binaryEncoding.py` | Binary decision spaces, knapsack problem, penalized objective |
 | `lesson05_crossover.py` | Genetic Algorithms Part 1: single-point crossover |
 | `lesson06_mutation.py` | Genetic Algorithms Part 2: bit-flip mutation |
+| `lesson07_selection.py` | Genetic Algorithms Part 3: tournament selection |
 
 ---
 
@@ -89,6 +90,7 @@ Optimization-Koans/
 ├── lesson04_binaryEncoding.py
 ├── lesson05_crossover.py
 ├── lesson06_mutation.py
+├── lesson07_selection.py
 └── tests/
     ├── test_lesson00_key.py
     ├── test_lesson01_key.py
@@ -96,5 +98,6 @@ Optimization-Koans/
     ├── test_lesson03_key.py
     ├── test_lesson04_key.py
     ├── test_lesson05_key.py
-    └── test_lesson06_key.py
+    ├── test_lesson06_key.py
+    └── test_lesson07_key.py
 ```
