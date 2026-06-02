@@ -8,4 +8,5 @@ dependencies:
   - numpy
   - scipy
   - matplotlib
+  - pymoo
   - pip
