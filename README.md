@@ -17,6 +17,7 @@ each lesson is a Python file full of tests that fail until you fill them in.
 | `lesson06_mutation.py` | Genetic Algorithms Part 2: bit-flip mutation |
 | `lesson07_selection.py` | Genetic Algorithms Part 3: tournament selection |
 | `lesson08_geneticAlgorithm.py` | Genetic Algorithms Part 4: the complete GA |
+| `lesson09_pymoo.py` | Using a library: continuous optimization with pymoo |
 
 ---
 
@@ -93,6 +94,7 @@ Optimization-Koans/
 ├── lesson06_mutation.py
 ├── lesson07_selection.py
 ├── lesson08_geneticAlgorithm.py
+├── lesson09_pymoo.py
 └── tests/
     ├── test_lesson00_key.py
     ├── test_lesson01_key.py
@@ -102,5 +104,6 @@ Optimization-Koans/
     ├── test_lesson05_key.py
     ├── test_lesson06_key.py
     ├── test_lesson07_key.py
-    └── test_lesson08_key.py
+    ├── test_lesson08_key.py
+    └── test_lesson09_key.py
 ```
