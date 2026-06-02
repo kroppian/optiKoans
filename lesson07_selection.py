@@ -68,8 +68,8 @@ def test_01_population_structure():
     A population is a list of individuals. Each individual is a bit string,
     and each has a corresponding score in the `scores` list.
     """
-    assert len(population) == FILL_ME_IN   # how many individuals in this population?
-    assert population[0]   == FILL_ME_IN   # what is the first individual?
+    assert len(population) == 4   # how many individuals in this population?
+    assert population[0]   == [1, 1, 1, 0, 1, 1, 0, 0]   # what is the first individual?
 
 
 # ---------------------------------------------------------------------------
@@ -82,8 +82,8 @@ def test_02_finding_the_best():
     `min(scores)` gives the best score; `scores.index(...)` locates it.
     """
     best_score = min(scores)
-    assert best_score == FILL_ME_IN                             # what is the lowest score?
-    assert population[scores.index(best_score)] == FILL_ME_IN   # which individual has it?
+    assert best_score == -24                            # what is the lowest score?
+    assert population[scores.index(best_score)] == population[0]  # which individual has it?
 
 
 # ---------------------------------------------------------------------------
@@ -97,7 +97,7 @@ def test_03_tournament_optimal_vs_infeasible():
     """
     i, j = 0, 2
     winner = i if scores[i] <= scores[j] else j
-    assert winner == FILL_ME_IN    # which index wins this tournament?
+    assert winner == 0    # which index wins this tournament?
 
 
 # ---------------------------------------------------------------------------
@@ -111,7 +111,7 @@ def test_04_tournament_suboptimal_vs_zeros():
     """
     i, j = 1, 3
     winner = i if scores[i] <= scores[j] else j
-    assert winner == FILL_ME_IN    # which index wins this tournament?
+    assert winner == 1  # which index wins this tournament?
 
 
 # ---------------------------------------------------------------------------
@@ -126,11 +126,11 @@ def test_05_infeasible_always_loses():
     We can verify: `min(other_score, 2974) < 2974` is always True.
     """
     # Does infeasible lose to the optimal (score=−24)?
-    assert (min(-24, 2974) < 2974) == FILL_ME_IN    # True or False?
+    assert (min(-24, 2974) < 2974) == True    # True or False?
     # Does infeasible lose to the suboptimal (score=−21)?
-    assert (min(-21, 2974) < 2974) == FILL_ME_IN    # True or False?
+    assert (min(-21, 2974) < 2974) == True    # True or False?
     # Does infeasible lose to the all-zeros (score=0)?
-    assert (min(  0, 2974) < 2974) == FILL_ME_IN    # True or False?
+    assert (min(  0, 2974) < 2974) == True    # True or False?
 
 
 # ---------------------------------------------------------------------------
@@ -151,7 +151,9 @@ def tournament_select_matchup(population, scores):
     Replace `pass` with your implementation.
     Hint: use random.sample(range(len(population)), 2) to pick two indices.
     """
-    pass  # TODO: implement this
+    i, j = random.sample(range(len(population)), 2)
+    winner = i if scores[i] <= scores[j] else j
+    return population[winner]
 
 
 def test_06_implement_tournament_select_matchup():
@@ -179,7 +181,9 @@ def tournament_select(population, scores, n):
     Replace `pass` with your implementation.
     Hint: use a list comprehension that calls tournament_select_matchup n times.
     """
-    pass  # TODO: implement this
+    selected = [tournament_select_matchup(population, scores) for _ in range(n)]
+    
+    return selected
 
 
 def test_07_implement_tournament_select():

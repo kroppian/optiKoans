@@ -72,10 +72,10 @@ def test_01_rastrigin():
     The global minimum is at the origin where f = 0. Every integer grid point
     is a local minimum whose value equals the count of non-zero coordinates.
     """
-    assert rastrigin([0, 0])  == FILL_ME_IN   # global minimum in 2D
-    assert rastrigin([1, 0])  == FILL_ME_IN   # one step away from origin
-    assert rastrigin([1, 1])  == FILL_ME_IN   # two steps away from origin
-    assert rastrigin([0] * 5) == FILL_ME_IN   # global minimum in 5D
+    assert rastrigin([0, 0])  == 0.0  # global minimum in 2D
+    assert rastrigin([1, 0])  == 1.0  # one step away from origin
+    assert rastrigin([1, 1])  == 2.0  # two steps away from origin
+    assert rastrigin([0] * 5) == 0.0   # global minimum in 5D
 
 
 # ---------------------------------------------------------------------------

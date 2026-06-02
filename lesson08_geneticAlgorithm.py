@@ -59,19 +59,20 @@ def initialize_population(pop_size, genome_length):
     Replace `pass` with your implementation.
     Hint: use a nested list comprehension with random.randint(0, 1).
     """
-    pass  # TODO: implement this
+    population = [[random.randint(0, 1) for _ in range(genome_length)] for _ in range(pop_size)]
+    return population
 
 
 def test_01_initialize_population():
     random.seed(0)
     pop = initialize_population(pop_size=10, genome_length=8)
 
-    assert len(pop) == FILL_ME_IN                                     # how many individuals?
-    assert len(pop[0]) == FILL_ME_IN                                  # how long is each genome?
-    assert all(b in (0, 1) for ind in pop for b in ind) == FILL_ME_IN  # all bits valid?
+    assert len(pop) == 10                                     # how many individuals?
+    assert len(pop[0]) == 8                                  # how long is each genome?
+    assert all(b in (0, 1) for ind in pop for b in ind) == True  # all bits valid?
     all_bits = [b for ind in pop for b in ind]
-    assert (0 in all_bits) == FILL_ME_IN   # does 0 appear? (not all-ones)
-    assert (1 in all_bits) == FILL_ME_IN   # does 1 appear? (not all-zeros)
+    assert (0 in all_bits) == True   # does 0 appear? (not all-ones)
+    assert (1 in all_bits) == True   # does 1 appear? (not all-zeros)
 
 
 # ---------------------------------------------------------------------------
@@ -88,14 +89,14 @@ def objective(bits, weights, values):
     Replace `pass` with your implementation.
     Hint: use sum(b * v for b, v in zip(bits, values)), then negate.
     """
-    pass  # TODO: implement this
+    return -(sum(b * v for b, v in zip(bits, values)))
 
 
 def test_02_objective():
     # Optimal selection picks items worth 24 total
-    assert objective([1, 1, 1, 0, 1, 1, 0, 0], weights, values) == FILL_ME_IN
+    assert objective([1, 1, 1, 0, 1, 1, 0, 0], weights, values) == -24
     # Empty selection has zero value
-    assert objective([0, 0, 0, 0, 0, 0, 0, 0], weights, values) == FILL_ME_IN
+    assert objective([0, 0, 0, 0, 0, 0, 0, 0], weights, values) == 0
 
 
 # ---------------------------------------------------------------------------
@@ -113,16 +114,17 @@ def penalty(bits, weights, capacity, penalty_weight=1000):
 
     Replace `pass` with your implementation.
     """
-    pass  # TODO: implement this
-
+    total_weight =  sum(bit * weight for bit, weight in zip(bits, weights))
+    
+    return (max(0, total_weight - capacity) * penalty_weight)
 
 def test_03_penalty():
     # Optimal selection: weight=15, capacity=15 → no violation
-    assert penalty([1, 1, 1, 0, 1, 1, 0, 0], weights, capacity) == FILL_ME_IN
+    assert penalty([1, 1, 1, 0, 1, 1, 0, 0], weights, capacity) == 0
     # Infeasible selection: weight=18, excess=3 → penalty = 3 × 1000
-    assert penalty([1, 1, 0, 1, 0, 1, 0, 0], weights, capacity) == FILL_ME_IN
+    assert penalty([1, 1, 0, 1, 0, 1, 0, 0], weights, capacity) == 3000
     # Same infeasible selection with a smaller penalty weight
-    assert penalty([1, 1, 0, 1, 0, 1, 0, 0], weights, capacity, penalty_weight=100) == FILL_ME_IN
+    assert penalty([1, 1, 0, 1, 0, 1, 0, 0], weights, capacity, penalty_weight=100) == 300
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +143,9 @@ def tournament_select_matchup(population, scores):
     Replace `pass` with your implementation.
     Hint: use random.sample(range(len(population)), 2) to pick two indices.
     """
-    pass  # TODO: implement this
+    i, j = random.sample(range(len(population)), 2)
+    winner = i if scores[i] <= scores[j] else j
+    return population[winner]
 
 
 def test_04_tournament_select_matchup():
@@ -149,8 +153,8 @@ def test_04_tournament_select_matchup():
     pop2  = [[1, 1, 1, 0, 1, 1, 0, 0], [1, 0, 1, 0, 1, 1, 0, 1]]
     scr2  = [-24, -21]
     winner = tournament_select_matchup(pop2, scr2)
-    assert winner == FILL_ME_IN    # which individual has the lower score?
-    assert len(winner) == FILL_ME_IN
+    assert winner == pop2[0]    # which individual has the lower score?
+    assert len(winner) == 8
 
 
 # ---------------------------------------------------------------------------
@@ -171,7 +175,12 @@ def crossover(parent1, parent2):
 
     Replace `pass` with your implementation.
     """
-    pass  # TODO: implement this
+    point = random.randint(1, len(parent1) -1)
+    child1 = parent1[:point] + parent2[point:]
+    child2 = parent2[:point] + parent1[point:]
+    print(point)
+    return(child1, child2)
+
 
 
 def test_05_crossover():
@@ -181,10 +190,10 @@ def test_05_crossover():
     # With seed=0, random.randint(1, 7) = 7 → only the last bit is swapped
     random.seed(0)
     child1, child2 = crossover(parent1, parent2)
-    assert child1 == FILL_ME_IN
-    assert child2 == FILL_ME_IN
-    assert len(child1) == FILL_ME_IN
-    assert len(child2) == FILL_ME_IN
+    assert child1 == [1, 0, 1, 1, 0, 1, 0, 1]
+    assert child2 == [0, 1, 0, 0, 1, 0, 1, 0]
+    assert len(child1) == 8
+    assert len(child2) == 8
 
 
 # ---------------------------------------------------------------------------
@@ -201,7 +210,7 @@ def mutate(bits, mutation_rate):
     Replace `pass` with your implementation.
     Hint: use a list comprehension; flip with `1 - b` when random.random() < mutation_rate.
     """
-    pass  # TODO: implement this
+    return [1-b if random.random() < mutation_rate else b for b in bits]
 
 
 def test_06_mutate():
@@ -210,13 +219,13 @@ def test_06_mutate():
     # Deterministic result with seed=0, rate=0.5
     random.seed(0)
     mutated = mutate(genome, 0.5)
-    assert mutated == FILL_ME_IN
-    assert len(mutated) == FILL_ME_IN
+    assert mutated == [1, 0, 0, 1, 1, 1, 1, 1]
+    assert len(mutated) == 8
 
     # Rate=1.0 flips every bit regardless of seed
-    assert mutate(genome, 1.0) == FILL_ME_IN
+    assert mutate(genome, 1.0) == [0, 1, 0, 1, 0, 1, 0, 1]
     # Rate=0.0 flips nothing regardless of seed
-    assert mutate(genome, 0.0) == FILL_ME_IN
+    assert mutate(genome, 0.0) == [1, 0, 1, 0, 1, 0, 1, 0]
 
 
 # ---------------------------------------------------------------------------
@@ -228,20 +237,9 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
     """
     Run a genetic algorithm to minimize the penalized knapsack objective.
     Returns the best individual from the final generation.
-
-    pop_size must be even (individuals are paired for selection and crossover).
-
-    Pseudocode — fill in each step:
-      1. Seed the RNG with `seed`
-      2. Initialize a population of pop_size random bit strings
-         (genome_length = len(weights))
-      3. Evaluate every individual:
-             score = objective(ind, weights, values)
-                   + penalty(ind, weights, capacity)
-      4. Set n_elites = pop_size // 10
+    
+      
       5. For each generation:
-           a. Elitism — identify and preserve the best individuals:
-                  Sort individuals by score and take the top n_elites as elites
 
            b. Selection — build a mating pool of pop_size winners:
                   Do the following twice:
@@ -262,7 +260,30 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
              _, best_ind = min(zip(scores, population))
              return best_ind
     """
-    pass  # TODO: implement this
+    random.seed(seed)
+    population = [[random.randint(0, 1) for _ in range(len(weights))] for _ in range(pop_size)]
+    
+    scores = [objective(ind, weights, values) + penalty(ind, weights, capacity)
+             for ind in population
+    ]
+
+    n_elites = pop_size // 10
+    for gen in range(n_generations):
+
+        sorted_pairs = sorted(zip(scores, population))
+        sorted_population = []
+        for score, ind in sorted_pairs:
+            sorted_population.append(ind)
+        elites = sorted_population[:n_elites]
+
+        mating_pool = []
+        for _ in range(2):
+            pool_data = list(zip(scores, population))
+            random.shuffle(pool_data)
+
+            mating_pool = [tournament_select_matchup(population, scores) for _ in range(pop_size)]
+
+            
 
 
 def test_07_run_ga():

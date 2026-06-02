@@ -121,7 +121,7 @@ def test_05_rate_one_flips_everything():
     Every bit flips — the result is the bitwise complement of the genome.
     """
     genome  = [1, 0, 1, 0, 1, 0, 1, 0]
-    mutated = [flip_bit(b) if random.random() < 1.0 else b for b in genome]
+    mutated = [flip_bit(b) if (random.random() < 1.0) else b for b in genome]
 
     assert mutated == [0, 1, 0, 1, 0, 1, 0, 1]
 
@@ -141,6 +141,8 @@ def mutate(bits, mutation_rate):
     Replace `pass` with your implementation.
     Hint: use a list comprehension with random.random() and flip_bit.
     """
+
+    return [flip_bit(b) if random.random() < mutation_rate else b for b in bits]
     
 
 
