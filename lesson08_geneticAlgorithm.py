@@ -324,7 +324,7 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
             for child in [child1, child2]:
                 if len(children) < needed_children:
                     mutated_child = [
-                        gene if random.random() > mutation_rate else 1- gene
+                        gene if random.random() > mutation_rate else 1 - gene
                         for gene in child
                     ]
                     children.append(mutated_child)
