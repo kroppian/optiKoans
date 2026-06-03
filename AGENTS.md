@@ -33,6 +33,7 @@ Optimization-Koans/
 ├── lesson08_geneticAlgorithm.py
 ├── lesson09_pymoo.py
 ├── lesson10_parallelization.py
+├── lesson11_multiobjective.py
 └── tests/
     ├── test_platform.py          # runner + sentinel regression tests
     ├── test_lesson00_key.py      # answer key for lesson 00
@@ -45,7 +46,8 @@ Optimization-Koans/
     ├── test_lesson07_key.py      # answer key for lesson 07
     ├── test_lesson08_key.py      # answer key for lesson 08
     ├── test_lesson09_key.py      # answer key for lesson 09
-    └── test_lesson10_key.py      # answer key for lesson 10
+    ├── test_lesson10_key.py      # answer key for lesson 10
+    └── test_lesson11_key.py      # answer key for lesson 11
 ```
 
 ---
@@ -56,7 +58,7 @@ Optimization-Koans/
 - `python optiKoans.py lesson00_finding_good_answers.py` — single file verbose run
 
 **Regression suite:**
-- `pytest tests/` — runs 117 regression tests (answer keys + platform tests); all should pass on a clean checkout
+- `pytest tests/` — runs 132 regression tests (answer keys + platform tests); all should pass on a clean checkout
 - Do NOT run bare `pytest` (no args) — it will try to collect lesson files too
 
 ---
@@ -116,6 +118,7 @@ Planned arc: brute force → stochastic search → guided stochastic (GA) → gr
 - `lesson08` — GA Part 4: the complete GA; students re-implement all components from scratch (initialize population, objective, penalty, tournament matchup, crossover with internal random point, mutation); final `run_ga` uses 10% elitism + two-round shuffle-and-pair selection; finds optimal `[1,1,1,0,1,1,0,0]` for seed=0 with pop_size=50, n_generations=50
 - `lesson09` — Using a library: pymoo solves the Rastrigin function (continuous, 5 variables, bounds [−5.12, 5.12]); three-step API: subclass `ElementwiseProblem` → choose `GA` algorithm → call `minimize()`; koans: understand the function, define the Problem class, call `_evaluate` directly, read `res.X`/`res.F`, implement `solve_rastrigin`
 - `lesson10` — Parallel objective evaluation via `Problem` (not `ElementwiseProblem`); `Problem._evaluate(self, X, out)` receives the full population matrix `X` of shape `(pop_size, n_var)` and must fill `out["F"]` of shape `(pop_size, n_obj)`; `ThreadPool.map(rastrigin, X)` dispatches all row evaluations concurrently; koans: trace the shape contract of `_evaluate`, compare serial vs parallel map output, implement `ParallelRastriginProblem(Problem)`, implement `solve_rastrigin_parallel`
+- `lesson11` — Multiobjective optimization; two knapsack objectives (`−total_value`, `total_weight`) replace the single penalized score; Pareto dominance and Pareto front concepts; NSGA-II via pymoo (`NSGA2` swapped for `GA`, `n_obj=2`); result is a matrix of Pareto-optimal solutions (`res.X` 2D, `res.F` 2D); koans: compute two objectives, reason through Pareto dominance, implement `KnapsackMOO(ElementwiseProblem)`, read NSGA-II result shapes, implement `solve_knapsack_moo`
 
 **Central knapsack fixture (lessons 04–08):**
 ```python
