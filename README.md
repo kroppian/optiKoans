@@ -19,6 +19,7 @@ each lesson is a Python file full of tests that fail until you fill them in.
 | `lesson08_geneticAlgorithm.py` | Genetic Algorithms Part 4: the complete GA |
 | `lesson09_pymoo.py` | Using a library: continuous optimization with pymoo |
 | `lesson10_parallelization.py` | Parallel objective evaluation with ThreadPool |
+| `lesson11_multiobjective.py` | Multiobjective optimization: Pareto fronts with NSGA-II |
 
 ---
 
@@ -97,6 +98,7 @@ Optimization-Koans/
 ├── lesson08_geneticAlgorithm.py
 ├── lesson09_pymoo.py
 ├── lesson10_parallelization.py
+├── lesson11_multiobjective.py
 └── tests/
     ├── test_lesson00_key.py
     ├── test_lesson01_key.py
@@ -108,5 +110,6 @@ Optimization-Koans/
     ├── test_lesson07_key.py
     ├── test_lesson08_key.py
     ├── test_lesson09_key.py
-    └── test_lesson10_key.py
+    ├── test_lesson10_key.py
+    └── test_lesson11_key.py
 ```
