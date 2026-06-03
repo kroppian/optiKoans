@@ -28,10 +28,11 @@ def _rastrigin(x):
 # ---------------------------------------------------------------------------
 
 class _RastriginProblem(ElementwiseProblem):
-    def __init__(self, n_var=5):
+    def __init__(self, n_var=5, **kwargs):
         super().__init__(n_var=n_var, n_obj=1,
                          xl=np.full(n_var, -5.12),
-                         xu=np.full(n_var,  5.12))
+                         xu=np.full(n_var,  5.12),
+                         **kwargs)
 
     def _evaluate(self, x, out, *args, **kwargs):
         out["F"] = _rastrigin(x)

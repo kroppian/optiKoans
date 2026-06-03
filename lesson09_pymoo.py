@@ -91,7 +91,8 @@ class RastriginProblem(ElementwiseProblem):
 
     Hints:
       __init__ — call super().__init__ with n_var=n_var, n_obj=1,
-                 xl=np.full(n_var, -5.12), xu=np.full(n_var, 5.12)
+                 xl=np.full(n_var, -5.12), xu=np.full(n_var, 5.12), **kwargs
+                 The **kwargs lets callers pass optional pymoo parameters.
       _evaluate — compute rastrigin(x) and assign it to out["F"]
     """
 
