@@ -87,17 +87,17 @@ def test_01_evaluate_shapes():
                   [3, 3, 3],
                   [0, 0, 0]])   # 4 solutions, 3 variables each
 
-    assert X.shape         == FILL_ME_IN   # (pop_size, n_var)
-    assert X.shape[0]      == FILL_ME_IN   # number of solutions in this batch
-    assert X.shape[1]      == FILL_ME_IN   # number of variables per solution
-    assert list(X[0])      == FILL_ME_IN   # first solution (first row)
+    assert X.shape         == (4, 3)   # (pop_size, n_var)
+    assert X.shape[0]      == 4  # number of solutions in this batch
+    assert X.shape[1]      == 3   # number of variables per solution
+    assert list(X[0])      == [1, 1, 1]   # first solution (first row)
 
     # Compute one scalar objective per solution, then reshape for out["F"]
     f_values = [poly(x) for x in X]
-    assert f_values == FILL_ME_IN          # list of scalar objectives
+    assert f_values == [1, 14, 39, 0]         # list of scalar objectives
 
     F = np.array(f_values).reshape(-1, 1)
-    assert F.shape == FILL_ME_IN           # required shape for out["F"]
+    assert F.shape == (1, 4)         # required shape for out["F"]
 
 
 # ---------------------------------------------------------------------------
