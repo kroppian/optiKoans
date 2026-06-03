@@ -32,6 +32,7 @@ Optimization-Koans/
 ├── lesson07_selection.py
 ├── lesson08_geneticAlgorithm.py
 ├── lesson09_pymoo.py
+├── lesson10_parallelization.py
 └── tests/
     ├── test_platform.py          # runner + sentinel regression tests
     ├── test_lesson00_key.py      # answer key for lesson 00
@@ -43,7 +44,8 @@ Optimization-Koans/
     ├── test_lesson06_key.py      # answer key for lesson 06
     ├── test_lesson07_key.py      # answer key for lesson 07
     ├── test_lesson08_key.py      # answer key for lesson 08
-    └── test_lesson09_key.py      # answer key for lesson 09
+    ├── test_lesson09_key.py      # answer key for lesson 09
+    └── test_lesson10_key.py      # answer key for lesson 10
 ```
 
 ---
@@ -54,7 +56,7 @@ Optimization-Koans/
 - `python optiKoans.py lesson00_finding_good_answers.py` — single file verbose run
 
 **Regression suite:**
-- `pytest tests/` — runs 111 regression tests (answer keys + platform tests); all should pass on a clean checkout
+- `pytest tests/` — runs 124 regression tests (answer keys + platform tests); all should pass on a clean checkout
 - Do NOT run bare `pytest` (no args) — it will try to collect lesson files too
 
 ---
@@ -112,7 +114,8 @@ Planned arc: brute force → stochastic search → guided stochastic (GA) → gr
 - `lesson06` — GA Part 2: bit-flip mutation; why mutation maintains diversity; `flip_bit(bit)` helper (asserts 0 or 1); mutation rate trade-off; implement `mutate(bits, mutation_rate)` — no seed, caller manages state
 - `lesson07` — GA Part 3: tournament selection; binary tournament; `tournament_select_matchup(population, scores)` returns the winner of one 2-way draw; `tournament_select(population, scores, n)` builds a mating pool of n winners; mean-score test confirms selection pressure
 - `lesson08` — GA Part 4: the complete GA; students re-implement all components from scratch (initialize population, objective, penalty, tournament matchup, crossover with internal random point, mutation); final `run_ga` uses 10% elitism + two-round shuffle-and-pair selection; finds optimal `[1,1,1,0,1,1,0,0]` for seed=0 with pop_size=50, n_generations=50
-- `lesson09` — Using a library: pymoo solves the Rastrigin function (continuous, 5 variables, bounds [−5.12, 5.12]); three-step API: subclass `ElementwiseProblem` → choose `GA` algorithm → call `minimize()`; koans cover understanding the function, defining the Problem class, calling `_evaluate` directly, reading `res.X`/`res.F`, and writing `solve_rastrigin(n_var, pop_size, n_gen, seed) → (best_x, best_f)`
+- `lesson09` — Using a library: pymoo solves the Rastrigin function (continuous, 5 variables, bounds [−5.12, 5.12]); three-step API: subclass `ElementwiseProblem` → choose `GA` algorithm → call `minimize()`; koans: understand the function, define the Problem class, call `_evaluate` directly, read `res.X`/`res.F`, implement `solve_rastrigin`
+- `lesson10` — Parallel objective evaluation via `Problem` (not `ElementwiseProblem`); `Problem._evaluate(self, X, out)` receives the full population matrix `X` of shape `(pop_size, n_var)` and must fill `out["F"]` of shape `(pop_size, n_obj)`; `ThreadPool.map(rastrigin, X)` dispatches all row evaluations concurrently; koans: trace the shape contract of `_evaluate`, compare serial vs parallel map output, implement `ParallelRastriginProblem(Problem)`, implement `solve_rastrigin_parallel`
 
 **Central knapsack fixture (lessons 04–08):**
 ```python
