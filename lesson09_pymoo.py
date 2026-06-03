@@ -96,18 +96,23 @@ class RastriginProblem(ElementwiseProblem):
     """
 
     def __init__(self, n_var=5):
-        pass  # TODO: implement this
+        super().__init__(
+            n_var = n_var,
+            n_obj = 1,
+            xl = np.full(n_var, -5.12),
+            xu = np.full(n_var, 5.12)
+        )
 
     def _evaluate(self, x, out, *args, **kwargs):
-        pass  # TODO: implement this
+        out["F"] = rastrigin(x)
 
 
 def test_02_rastrigin_problem():
     problem = RastriginProblem(n_var=5)
-    assert problem.n_var == FILL_ME_IN   # number of decision variables
-    assert problem.n_obj == FILL_ME_IN   # number of objectives
-    assert problem.xl[0] == FILL_ME_IN   # lower bound on each variable
-    assert problem.xu[0] == FILL_ME_IN   # upper bound on each variable
+    assert problem.n_var == 5   # number of decision variables
+    assert problem.n_obj == 1   # number of objectives
+    assert problem.xl[0] == -5.12   # lower bound on each variable
+    assert problem.xu[0] == 5.12  # upper bound on each variable
 
 
 # ---------------------------------------------------------------------------

@@ -234,12 +234,24 @@ def test_06_mutate():
 
 def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
            mutation_rate=0.125, seed=0):
+     
     """
     Run a genetic algorithm to minimize the penalized knapsack objective.
     Returns the best individual from the final generation.
-    
-      
+
+    pop_size must be even (individuals are paired for selection and crossover).
+
+    Pseudocode — fill in each step:
+      1. Seed the RNG with `seed`
+      2. Initialize a population of pop_size random bit strings
+         (genome_length = len(weights))
+      3. Evaluate every individual:
+             score = objective(ind, weights, values)
+                   + penalty(ind, weights, capacity)
+      4. Set n_elites = pop_size // 10
       5. For each generation:
+           a. Elitism — identify and preserve the best individuals:
+                  Sort individuals by score and take the top n_elites as elites
 
            b. Selection — build a mating pool of pop_size winners:
                   Do the following twice:
@@ -260,30 +272,73 @@ def run_ga(weights, values, capacity, pop_size=50, n_generations=50,
              _, best_ind = min(zip(scores, population))
              return best_ind
     """
+    #sets seed
     random.seed(seed)
+
+    #sets population
     population = [[random.randint(0, 1) for _ in range(len(weights))] for _ in range(pop_size)]
     
+    #creates scores
     scores = [objective(ind, weights, values) + penalty(ind, weights, capacity)
              for ind in population
     ]
 
     n_elites = pop_size // 10
+
+    #generations loop
     for gen in range(n_generations):
 
+        #a. Elitism
         sorted_pairs = sorted(zip(scores, population))
         sorted_population = []
         for score, ind in sorted_pairs:
             sorted_population.append(ind)
         elites = sorted_population[:n_elites]
 
+        #b. selection
         mating_pool = []
         for _ in range(2):
             pool_data = list(zip(scores, population))
             random.shuffle(pool_data)
 
-            mating_pool = [tournament_select_matchup(population, scores) for _ in range(pop_size)]
+            for i in range(0, len(pool_data), 2):
+                x1, x2 = pool_data[i], pool_data[i+1]
 
+                winner = x1[1] if x1[0] < x2[0] else x2[1]
+                mating_pool.append(winner)
+
+        #c reproduction
+        random.shuffle(mating_pool)
+        children = []
+        needed_children = pop_size - n_elites
+
+        for i in range(0, len(mating_pool), 2):
             
+            parent1 = mating_pool[i]
+            parent2 = mating_pool[i+1]
+
+            point = random.randint(1, len(weights) - 1)
+            child1 = parent1[:point] + parent2[point:]
+            child2 = parent2[:point] + parent1[point:]
+
+            for child in [child1, child2]:
+                if len(children) < needed_children:
+                    mutated_child = [
+                        gene if random.random() > mutation_rate else 1- gene
+                        for gene in child
+                    ]
+                    children.append(mutated_child)
+
+        population = elites + children
+
+        scores = [objective(ind, weights, values) + penalty(ind, weights, capacity)
+             for ind in population
+        ]   
+
+    _, best_ind = min(zip(scores, population))
+    return best_ind
+    
+
 
 
 def test_07_run_ga():
