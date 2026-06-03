@@ -168,32 +168,44 @@ def test_06_implement_tournament_select_matchup():
 # Koan 07 — Implement tournament_select
 # ---------------------------------------------------------------------------
 
-def tournament_select(population, scores, n):
+def tournament_select(population, scores):
     """
-    Build a mating pool of n individuals by running n independent
-    binary tournaments. Each call to tournament_select_matchup adds one winner.
+    Build a mating pool of len(population) winners using the same
+    shuffle-and-pair approach the GA uses:
+
+      Do the following twice:
+        1. Shuffle the population indices randomly.
+        2. Walk through the shuffled list in adjacent pairs.
+        3. For each pair, the individual with the lower score wins
+           and enters the mating pool.
+
+    Two rounds of (pop_size / 2) matchups produces pop_size winners total.
+    pop_size must be even.
 
     This function does NOT set a random seed — the caller is responsible
     for seeding before calling tournament_select() for reproducible results.
 
     Replace `pass` with your implementation.
-    Hint: use a list comprehension that calls tournament_select_matchup n times.
+    Hint: use random.shuffle on a list of indices, then step through pairs
+    with range(0, len(population), 2).
     """
     pass  # TODO: implement this
 
 
 def test_07_implement_tournament_select():
     """
-    Selection pressure: the mean score of the selected pool should be
-    lower (better) than the mean score of the original population, because
-    good individuals win tournaments more often than bad ones.
+    Selection pressure: the infeasible individual (score=2974) never wins a
+    tournament, so its large penalty score is never carried into the mating pool.
+    The mean score of the selected pool should be lower (better) than the
+    original population's mean, which is dragged up by the infeasible individual.
     """
     mean_original = sum(scores) / len(scores)   # = (-24 + -21 + 2974 + 0) / 4 = 732.25
 
     random.seed(0)
-    selected = tournament_select(population, scores, n=200)
+    selected = tournament_select(population, scores)
     selected_scores = [scores[population.index(w)] for w in selected]
     mean_selected = sum(selected_scores) / len(selected_scores)
 
-    assert len(selected) == 200                  # must return exactly n individuals
+    assert len(selected) == len(population)      # returns one winner per original individual
+    assert [1, 1, 0, 1, 0, 1, 0, 0] not in selected   # infeasible never wins
     assert mean_selected < mean_original         # selection pressure improves the pool
