@@ -52,7 +52,7 @@ def _solve_rastrigin_parallel(n_var=5, pop_size=100, n_gen=200, seed=1, n_worker
 # ---------------------------------------------------------------------------
 # Koan 01
 # ---------------------------------------------------------------------------
-
+# TODO make this one test to make it flow like the main Koan
 def test_koan01_full_shape():
     X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
     assert X.shape == (3, 3)

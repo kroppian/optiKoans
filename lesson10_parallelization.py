@@ -71,7 +71,11 @@ def test_01_evaluate_shapes():
     scalar objectives to the required column-vector shape.
 
     Trace through the example below to understand both shapes.
+
+    # TODO I noticed that the example objective functions for Koan 1 and 2. Use x_1 + x_2^2 + x_3^3 as the objective function, and introduce the assumption 
+    
     """
+    # TODO Change this to four solutions, three variables each. Change this for all of the other koans 
     X = np.array([[1, 2, 3],
                   [4, 5, 6],
                   [7, 8, 9]])   # 3 solutions, 3 variables each
@@ -82,7 +86,7 @@ def test_01_evaluate_shapes():
     assert list(X[0])      == FILL_ME_IN   # first solution (first row)
 
     # Compute one scalar objective per solution, then reshape for out["F"]
-    f_values = [sum(x) for x in X]
+    f_values = [sum(x) for x in X]  
     assert f_values == FILL_ME_IN          # list of scalar objectives
 
     F = np.array(f_values).reshape(-1, 1)
@@ -101,6 +105,8 @@ def test_02_threadpool_map():
 
     A ThreadPool uses OS threads, so it works on Windows without any
     import-guard and handles any callable without pickling.
+
+    # TODO see feedback for test 01
     """
     serial   = list(map(abs, [-3, 1, -4, 1, -5]))
     with ThreadPool(2) as pool:
@@ -127,13 +133,9 @@ class ParallelRastriginProblem(Problem):
     Replace each `pass` with your implementation.
 
     Hints:
-      __init__ — call super().__init__(n_var=n_var, n_obj=1,
-                     xl=np.full(n_var, -5.12), xu=np.full(n_var, 5.12))
-                 and store self.n_workers = n_workers
-      _evaluate — with ThreadPool(self.n_workers) as pool:
-                      results = pool.map(rastrigin, X)
-                  out["F"] = np.array(results).reshape(-1, 1)
-    """
+      __init__ — initializes the problem
+      _evaluate — evaluates the objectives and constraints
+  """
 
     def __init__(self, n_var=5, n_workers=4):
         pass  # TODO: implement this
@@ -169,10 +171,9 @@ def solve_rastrigin_parallel(n_var=5, pop_size=100, n_gen=200, seed=1, n_workers
 
     Replace `pass` with your implementation.
     Hints:
-      - Create ParallelRastriginProblem(n_var=n_var, n_workers=n_workers)
-      - Create GA(pop_size=pop_size, eliminate_duplicates=True)
-      - Call minimize(problem, algorithm, ('n_gen', n_gen),
-                      seed=seed, verbose=False)
+      - Initialize the problem
+      - Initialize the GA
+      - Call minimize
       - Return res.X and res.F[0]
     """
     pass  # TODO: implement this
