@@ -32,8 +32,16 @@ def _tournament_select_matchup(population, scores):
     return population[winner]
 
 
-def _tournament_select(population, scores, n):
-    return [_tournament_select_matchup(population, scores) for _ in range(n)]
+def _tournament_select(population, scores):
+    pool = []
+    indices = list(range(len(population)))
+    for _ in range(2):
+        random.shuffle(indices)
+        for k in range(0, len(indices), 2):
+            i, j = indices[k], indices[k + 1]
+            winner = i if scores[i] <= scores[j] else j
+            pool.append(population[winner])
+    return pool
 
 
 # ---------------------------------------------------------------------------
@@ -110,14 +118,14 @@ def test_koan06_matchup_length():
 
 def test_koan07_tournament_select_length():
     random.seed(0)
-    selected = _tournament_select(_population, _scores, n=200)
-    assert len(selected) == 200
+    selected = _tournament_select(_population, _scores)
+    assert len(selected) == len(_population)
 
 
 def test_koan07_tournament_select_mean_improves():
     mean_original = sum(_scores) / len(_scores)   # 732.25
     random.seed(0)
-    selected = _tournament_select(_population, _scores, n=200)
+    selected = _tournament_select(_population, _scores)
     selected_scores = [_scores[_population.index(w)] for w in selected]
     mean_selected = sum(selected_scores) / len(selected_scores)
     assert mean_selected < mean_original
@@ -125,5 +133,5 @@ def test_koan07_tournament_select_mean_improves():
 
 def test_koan07_infeasible_never_wins():
     random.seed(42)
-    selected = _tournament_select(_population, _scores, n=200)
+    selected = _tournament_select(_population, _scores)
     assert [1, 1, 0, 1, 0, 1, 0, 0] not in selected
