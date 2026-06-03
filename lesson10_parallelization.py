@@ -48,8 +48,17 @@ from conftest import FILL_ME_IN
 
 
 # ---------------------------------------------------------------------------
-# Rastrigin helper — provided; used inside _evaluate to score one solution
+# Helpers — provided; used in koans 01–02 and inside _evaluate
 # ---------------------------------------------------------------------------
+
+def poly(x):
+    """A simple polynomial: f(x) = x[0] + x[1]² + x[2]³.
+
+    Used in koans 01 and 02 to illustrate the shape contract and ThreadPool.map
+    without the complexity of the Rastrigin function.
+    """
+    return x[0] + x[1]**2 + x[2]**3
+
 
 def rastrigin(x):
     """Return the Rastrigin function value at point x (a sequence of floats)."""
@@ -70,15 +79,13 @@ def test_01_evaluate_shapes():
     (pop_size, n_obj). Use reshape(-1, 1) to go from a flat list of
     scalar objectives to the required column-vector shape.
 
+    Assume the objective function for one solution is poly(x) = x[0] + x[1]² + x[2]³.
     Trace through the example below to understand both shapes.
-
-    # TODO I noticed that the example objective functions for Koan 1 and 2. Use x_1 + x_2^2 + x_3^3 as the objective function, and introduce the assumption 
-    
     """
-    # TODO Change this to four solutions, three variables each. Change this for all of the other koans 
-    X = np.array([[1, 2, 3],
-                  [4, 5, 6],
-                  [7, 8, 9]])   # 3 solutions, 3 variables each
+    X = np.array([[1, 1, 1],
+                  [2, 2, 2],
+                  [3, 3, 3],
+                  [0, 0, 0]])   # 4 solutions, 3 variables each
 
     assert X.shape         == FILL_ME_IN   # (pop_size, n_var)
     assert X.shape[0]      == FILL_ME_IN   # number of solutions in this batch
@@ -86,7 +93,7 @@ def test_01_evaluate_shapes():
     assert list(X[0])      == FILL_ME_IN   # first solution (first row)
 
     # Compute one scalar objective per solution, then reshape for out["F"]
-    f_values = [sum(x) for x in X]  
+    f_values = [poly(x) for x in X]
     assert f_values == FILL_ME_IN          # list of scalar objectives
 
     F = np.array(f_values).reshape(-1, 1)
@@ -106,13 +113,19 @@ def test_02_threadpool_map():
     A ThreadPool uses OS threads, so it works on Windows without any
     import-guard and handles any callable without pickling.
 
-    # TODO see feedback for test 01
+    Using the same X and poly from koan 01 shows exactly how this maps
+    onto what _evaluate does with the full population.
     """
-    serial   = list(map(abs, [-3, 1, -4, 1, -5]))
-    with ThreadPool(2) as pool:
-        parallel = list(pool.map(abs, [-3, 1, -4, 1, -5]))
+    X = np.array([[1, 1, 1],
+                  [2, 2, 2],
+                  [3, 3, 3],
+                  [0, 0, 0]])
 
-    assert serial               == FILL_ME_IN   # result of applying abs serially
+    serial   = list(map(poly, X))
+    with ThreadPool(2) as pool:
+        parallel = list(pool.map(poly, X))
+
+    assert serial               == FILL_ME_IN   # result of applying poly serially
     assert parallel             == FILL_ME_IN   # same input, run concurrently
     assert (serial == parallel) == FILL_ME_IN   # do they agree?
 
@@ -150,10 +163,10 @@ def test_03_parallel_rastrigin_problem():
     Every solution scores 0, and the output must have the required shape.
     """
     problem = ParallelRastriginProblem(n_var=5, n_workers=2)
-    X   = np.zeros((3, 5))   # 3 solutions, all at the origin
+    X   = np.zeros((4, 5))   # 4 solutions, all at the origin
     out = {}
     problem._evaluate(X, out)
-    assert out["F"].shape == (3, 1)   # one objective per solution, column shape
+    assert out["F"].shape == (4, 1)   # one objective per solution, column shape
     assert out["F"][0, 0] == 0.0      # Rastrigin at origin is 0
 
 
