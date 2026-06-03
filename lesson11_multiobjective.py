@@ -21,7 +21,7 @@ For the knapsack we expose two objectives:
     f1 = −total_value   (minimize → maximize value)
     f2 =  total_weight  (minimize → prefer lighter solutions)
 
-No single solution is "best" — a high-value solution is necessarily heavier.
+No single solution is "best" — a high-value selection is necessarily heavier.
 The Pareto front shows the full spectrum of tradeoffs and lets the
 decision-maker choose based on their actual preference.
 
@@ -41,6 +41,7 @@ Run your progress with:
 
 import numpy as np
 from pymoo.algorithms.moo.nsga2 import NSGA2
+from pymoo.algorithms.soo.nonconvex.ga import GA
 from pymoo.core.problem import ElementwiseProblem
 from pymoo.optimize import minimize
 
@@ -72,8 +73,6 @@ def knapsack_objectives(bits, weights, values):
     return (-total_value, total_weight)
 
 
-# TODO let's add a new Koan that runs an epsilon constraint problem. In other words, run a simple pymoo GA 4 times with constraints along the theoretical PF. This will smoothly transition from a known concept (constraints) into a new concepts (Pareto optimality)
-
 # ---------------------------------------------------------------------------
 # Koan 01 — Two objectives
 # ---------------------------------------------------------------------------
@@ -99,42 +98,127 @@ def test_01_two_objectives():
 
 
 # ---------------------------------------------------------------------------
-# Koan 02 — Pareto dominance
+# Koan 02 — Tracing the front with epsilon constraints
 # ---------------------------------------------------------------------------
-# TODO Add an ASCII art plot that would demonstrate dominance. For example, a little ASCII plot of a minimalization problem with a series of points on a PF, points behind the PF that are dominated, a nadir point, and an ideal point
 
-def test_02_pareto_dominance():
+# Provided helper — not a koan.
+# Runs a single-objective GA that maximizes item value subject to
+# total weight <= max_weight.  Returns (best_value, actual_weight).
+
+class _EpsilonKnapsack(ElementwiseProblem):
+    """Single-objective knapsack with a maximum-weight inequality constraint."""
+    def __init__(self, max_weight):
+        self._max_weight = max_weight
+        super().__init__(n_var=8, n_obj=1, n_ieq_constr=1,
+                         xl=np.zeros(8), xu=np.ones(8))
+
+    def _evaluate(self, x, out, *args, **kwargs):
+        bits = x.round().astype(int)
+        total_value  = sum(b * v for b, v in zip(bits, values))
+        total_weight = sum(b * w for b, w in zip(bits, weights))
+        out["F"] = [-total_value]
+        out["G"] = [total_weight - self._max_weight]  # g <= 0 means feasible
+
+
+def run_epsilon_knapsack(max_weight, seed=1):
+    """Return (best_value, actual_weight) for value-maximization with weight <= max_weight."""
+    problem   = _EpsilonKnapsack(max_weight)
+    algorithm = GA(pop_size=50, eliminate_duplicates=True)
+    res       = minimize(problem, algorithm, ('n_gen', 200), seed=seed, verbose=False)
+    bits      = res.X.round().astype(int)
+    val       = int(-res.F[0])
+    wt        = int(sum(b * w for b, w in zip(bits, weights)))
+    return (val, wt)
+
+
+def test_02_epsilon_constraint():
+    """
+    Before NSGA-II existed, practitioners traced the Pareto front by hand:
+    solve the same problem N times, each time with a tighter or looser
+    constraint on one objective. This is the *epsilon-constraint method*.
+
+    `run_epsilon_knapsack(max_weight)` solves a single-objective GA that
+    maximizes item value subject to total weight <= max_weight (from lesson 01).
+    Run it four times with increasing weight budgets and observe how the
+    best achievable value changes.
+
+    Each (−value, weight) result is one point on the Pareto front.
+    NSGA-II will find all these tradeoff points simultaneously in koan 06.
+    """
+    val5,  wt5  = run_epsilon_knapsack(max_weight=5,  seed=1)
+    val10, wt10 = run_epsilon_knapsack(max_weight=10, seed=1)
+    val15, wt15 = run_epsilon_knapsack(max_weight=15, seed=1)
+    val25, wt25 = run_epsilon_knapsack(max_weight=25, seed=1)
+
+    # As the weight budget grows, the best achievable value increases.
+    assert (val5 < val10 < val15 < val25) == FILL_ME_IN   # True or False?
+
+    # With weight <= 15, the GA recovers the lesson-08 optimal.
+    assert val15 == FILL_ME_IN   # best value with weight <= 15
+    assert wt15  == FILL_ME_IN   # actual weight of the selected items
+
+    # Each run produces one Pareto-optimal (−value, weight) pair.
+    # What are the four points that together sketch the tradeoff curve?
+    assert (val5,  wt5)  == FILL_ME_IN   # tightest budget
+    assert (val10, wt10) == FILL_ME_IN
+    assert (val15, wt15) == FILL_ME_IN
+    assert (val25, wt25) == FILL_ME_IN   # most relaxed budget
+
+
+# ---------------------------------------------------------------------------
+# Koan 03 — Pareto dominance
+# ---------------------------------------------------------------------------
+
+def test_03_pareto_dominance():
     """
     Solution A *dominates* solution B when A is no worse than B on every
-    objective AND strictly better on at least one.
+    objective AND strictly better on at least one. Both objectives here are
+    minimized — lower is better on both axes.
 
     The *Pareto front* is the set of solutions that no other solution
-    dominates — these solutions represent the trade-offs of solutions
-    amongst the multiobjective objective space.
+    dominates. These solutions represent the genuine tradeoffs: you cannot
+    improve one objective without worsening another.
 
-    Work through the three comparisons below. Each uses the
-    dominance check for two objectives (f1, f2) where lower is better:
+    Objective space for this problem (both axes: lower is better):
 
-        A dominates B  iff  A.f1 <= B.f1  and  A.f2 <= B.f2
-                            (with at least one strict inequality)
+      f2 (weight)
+      ^
+   31 |  * ──────────────── Pareto front
+      |   ╲
+   25 |    *
+      |     ╲
+   15 |      * (−24, 15) ← lesson-08 optimal
+      |       ╲  o ← dominated: (−20, 16) is worse than (−24,15)
+   13 |        *    on f1 AND worse on f2
+      |         ╲
+    0 |          * pick nothing
+      └─────────────────────> f1 (−value)
+        −45 −37  −24 −21    0
+        (lower = more valuable)
 
-    Useful shortcut: if both conditions hold, A is at least as good on
-    both objectives; and because the values differ, at least one must
-    be strictly better.
+    The dominated point o lies to the upper-right of a Pareto solution.
+    A dominates B  iff  A.f1 <= B.f1  and  A.f2 <= B.f2
+                        (with at least one strict inequality)
 
-    TODO remind user if this is a minimization or maximizaiton problem
+    Work through the comparisons below.
     """
-    # A = (-24, 15): value=24, weight=15  (Optimal solution from lesson 08)
-    # B = (-21, 13): value=21, weight=13  (lighter but less valuable)
+    # A = (−24, 15): value=24, weight=15  (lesson-08 optimal)
+    # B = (−21, 13): value=21, weight=13  (lighter but less valuable)
+    # A has better f1 (−24 < −21) but worse f2 (15 > 13) → neither dominates
     assert ((-24 <= -21) and (15 <= 13)) == FILL_ME_IN   # does A dominate B?
 
-    # A = (-24, 15): value=24, weight=15
-    # C = (-20, 16): value=20, weight=16  (worse on both)
+    # A = (−24, 15): value=24, weight=15
+    # C = (−20, 16): value=20, weight=16  (worse on both objectives)
+    # A has better f1 AND better f2 → A dominates C
     assert ((-24 <= -20) and (15 <= 16)) == FILL_ME_IN   # does A dominate C?
+
+    # The Pareto front of {A=(−24,15), B=(−21,13), C=(−20,16)}:
+    # A dominates C, so C is excluded. A and B are mutually non-dominated.
+    assert FILL_ME_IN == 2   # how many solutions are on the Pareto front?
 
 
 # ---------------------------------------------------------------------------
-# Koan 03 — Implement KnapsackMOO
+# Koan 04 — Implement KnapsackMOO
 # ---------------------------------------------------------------------------
 
 class KnapsackMOO(ElementwiseProblem):
@@ -163,10 +247,10 @@ class KnapsackMOO(ElementwiseProblem):
         pass  # TODO: implement this
 
 
-def test_03_knapsack_moo_problem():
+def test_04_knapsack_moo_problem():
     """
     Call _evaluate directly with the lesson-08 optimal bit string.
-    The two objectives should be (-24, 15): value=24, weight=15.
+    The two objectives should be [-24, 15]: value=24, weight=15.
     """
     problem = KnapsackMOO()
     out = {}
@@ -175,10 +259,10 @@ def test_03_knapsack_moo_problem():
 
 
 # ---------------------------------------------------------------------------
-# Koan 04 — NSGA-II result shape
+# Koan 05 — NSGA-II result shape
 # ---------------------------------------------------------------------------
 
-def test_04_result_shape():
+def test_05_result_shape():
     """
     In lesson 09, GA returned a single best solution:
       res.X  — a 1D vector of length n_var
@@ -189,20 +273,20 @@ def test_04_result_shape():
       res.F  — a 2D matrix, one row per solution, one column per objective
 
     Trace through the shapes below. A quick run (n_gen=50) is used here
-    so the test finishes fast; you will use more generations in koan 05.
+    so the test finishes fast; you will use more generations in koan 06.
     """
     problem   = KnapsackMOO()
     algorithm = NSGA2(pop_size=50)
     res       = minimize(problem, algorithm, ('n_gen', 50), seed=1, verbose=False)
 
-    assert res.X.ndim      == FILL_ME_IN   # is res.X a 1D vector or a 2D matrix?
-    assert res.F.shape[1]  == FILL_ME_IN   # how many objective columns?
-    assert res.X.shape[1]  == FILL_ME_IN   # how many variable columns?
-    assert (len(res.X) > 1) == FILL_ME_IN  # does NSGA-II return more than one solution?
+    assert res.X.ndim       == FILL_ME_IN   # is res.X a 1D vector or a 2D matrix?
+    assert res.F.shape[1]   == FILL_ME_IN   # how many objective columns?
+    assert res.X.shape[1]   == FILL_ME_IN   # how many variable columns?
+    assert (len(res.X) > 1) == FILL_ME_IN   # does NSGA-II return more than one solution?
 
 
 # ---------------------------------------------------------------------------
-# Koan 05 — Solve and read the Pareto front
+# Koan 06 — Solve and read the Pareto front
 # ---------------------------------------------------------------------------
 
 def solve_knapsack_moo(pop_size=100, n_gen=200, seed=1):
@@ -222,7 +306,7 @@ def solve_knapsack_moo(pop_size=100, n_gen=200, seed=1):
     pass  # TODO: implement this
 
 
-def test_05_solve():
+def test_06_solve():
     """
     The Pareto front should contain multiple solutions representing the
     full value-vs-weight tradeoff. The best value on the front should
@@ -238,6 +322,3 @@ def test_05_solve():
     # should match or beat the lesson-08 optimal of value=24 (f1=−24).
     best_value_idx = np.argmin(pareto_F[:, 0])
     assert pareto_F[best_value_idx, 0] <= -24
-
-    # TODO print out the result as a matplotlib figure 
-

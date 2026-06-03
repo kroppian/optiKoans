@@ -58,7 +58,7 @@ Optimization-Koans/
 - `python optiKoans.py lesson00_finding_good_answers.py` — single file verbose run
 
 **Regression suite:**
-- `pytest tests/` — runs 132 regression tests (answer keys + platform tests); all should pass on a clean checkout
+- `pytest tests/` — runs 138 regression tests (answer keys + platform tests); all should pass on a clean checkout
 - Do NOT run bare `pytest` (no args) — it will try to collect lesson files too
 
 ---
