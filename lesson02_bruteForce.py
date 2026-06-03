@@ -49,8 +49,8 @@ def test_01_brute_force_evaluates_all():
     candidates = range(0, 10)
     best = min(candidates, key=f)
 
-    assert len(calls) == FILL_ME_IN  # How many candidates were evaluated?
-    assert best       == FILL_ME_IN  # Which x minimises (x − 4)²?
+    assert len(calls) == 10 # How many candidates were evaluated?
+    assert best       == 4  # Which x minimises (x − 4)²?
 
 
 # ---------------------------------------------------------------------------
@@ -66,9 +66,9 @@ def test_02_grid_search_space():
     x2_values = [0, 1, 2, 3]    # 4 choices for x2
     space = list(product(x1_values, x2_values))
 
-    assert len(space) == FILL_ME_IN   # How many (x1, x2) pairs are there?
-    assert space[0]   == FILL_ME_IN   # What is the very first pair?
-    assert space[-1]  == FILL_ME_IN   # What is the very last pair?
+    assert len(space) == 12   # How many (x1, x2) pairs are there?
+    assert space[0]   == (0, 0)   # What is the very first pair?
+    assert space[-1]  == (2, 3)   # What is the very last pair?
 
 
 # ---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ def test_03_brute_force_2d():
     space = product(range(5), range(5))   # x1, x2 ∈ {0, 1, 2, 3, 4}
     best = min(space, key=lambda p: f(*p))
 
-    assert best == FILL_ME_IN   # What (x1, x2) pair minimises f?
+    assert best == (1, 2)   # What (x1, x2) pair minimises f?
 
 
 # ---------------------------------------------------------------------------
@@ -100,13 +100,13 @@ def test_04_exponential_growth():
     This 'curse of dimensionality' is why brute force breaks for large problems.
     """
     # 1 variable, 10 choices each → how many candidates?
-    assert len(list(product(range(10), repeat=1))) == FILL_ME_IN
+    assert len(list(product(range(10), repeat=1))) == 10
 
     # 2 variables, 10 choices each → how many candidates?
-    assert len(list(product(range(10), repeat=2))) == FILL_ME_IN
+    assert len(list(product(range(10), repeat=2))) == 100
 
     # 3 variables, 10 choices each → how many candidates?
-    assert len(list(product(range(10), repeat=3))) == FILL_ME_IN
+    assert len(list(product(range(10), repeat=3))) == 1000
 
 
 # ---------------------------------------------------------------------------
@@ -129,8 +129,8 @@ def test_05_brute_force_with_constraint():
     feasible = [(x1, x2) for x1, x2 in all_candidates if is_feasible(x1, x2)]
     best = min(feasible, key=lambda p: f(*p))
 
-    assert len(feasible) == FILL_ME_IN   # How many candidates are feasible?
-    assert best          == FILL_ME_IN   # Which feasible pair minimises f?
+    assert len(feasible) == 21   # How many candidates are feasible?
+    assert best          == (0,5)   # Which feasible pair minimises f?
 
 
 # ---------------------------------------------------------------------------
@@ -145,7 +145,10 @@ def brute_force_minimize(f, x1_min, x1_max, x2_min, x2_max):
     Replace `pass` with your implementation.
     Hint: build the search space with product(range(...), range(...)).
     """
-    pass  # TODO: implement this
+    
+    space = product(range(x1_min, x1_max), range(x2_min, x2_max))   # x1, x2 ∈ {0, 1, 2, 3, 4}
+    best = min(space, key=lambda p: f(p))
+    return best
 
 
 def test_06_implement_brute_force_minimize():

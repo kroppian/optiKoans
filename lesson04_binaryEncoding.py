@@ -45,13 +45,13 @@ def test_01_bit_string_selects_items():
     """
     # 8 items are available (indices 0–7)
     bits = [1, 0, 0, 0, 0, 0, 0, 0]      # only item 0 is taken
-    assert sum(bits) == FILL_ME_IN       # how many items are selected?
+    assert sum(bits) == 1      # how many items are selected?
 
     bits = [1, 0, 1, 0, 1, 0, 0, 0]      # items 0, 2, and 4 are taken
-    assert sum(bits) == FILL_ME_IN       # how many items now?
+    assert sum(bits) == 3    # how many items now?
 
     bits = [1, 1, 1, 0, 1, 1, 0, 0]      # items 0, 1, 2, 4, 5 are taken
-    assert sum(bits) == FILL_ME_IN       # how many items now?
+    assert sum(bits) == 5     # how many items now?
 
 
 # ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ def test_02_total_weight():
     bits          = [ 1, 0, 1, 0, 0, 0, 0, 0]   # take items 0 and 2
 
     total_weight = sum(b * w for b, w in zip(bits, weights))
-    assert total_weight == FILL_ME_IN   # what is 1*2 + 0*5 + 1*3 + … ?
+    assert total_weight == 5  # what is 1*2 + 0*5 + 1*3 + … ?
 
 
 # ---------------------------------------------------------------------------
@@ -85,7 +85,7 @@ def test_03_total_value():
     bits          = [ 1, 0, 1, 0, 0, 0, 0, 0]   # same selection as koan 02
 
     total_value = sum(b * v for b, v in zip(bits, values))
-    assert total_value == FILL_ME_IN    # what is 1*4 + 0*7 + 1*5 + … ?
+    assert total_value == 9    # what is 1*4 + 0*7 + 1*5 + … ?
 
 
 # ---------------------------------------------------------------------------
@@ -106,8 +106,8 @@ def test_04_feasibility():
     bits_a = [1, 1, 1, 0, 1, 1, 0, 0]   # weight = 2+5+3+1+4 = 15
     bits_b = [1, 1, 0, 1, 0, 1, 0, 0]   # weight = 2+5+7+4   = 18
 
-    assert (total_weight(bits_a) <= capacity) == FILL_ME_IN   # is bits_a feasible?
-    assert (total_weight(bits_b) <= capacity) == FILL_ME_IN   # is bits_b feasible?
+    assert (total_weight(bits_a) <= capacity) == True  # is bits_a feasible?
+    assert (total_weight(bits_b) <= capacity) == False   # is bits_b feasible?
 
 
 # ---------------------------------------------------------------------------
@@ -133,11 +133,11 @@ def test_05_maximization_as_minimization():
     score_a = -total_value(bits_a)
     score_b = -total_value(bits_b)
 
-    assert score_a == FILL_ME_IN   # what is the minimization score for bits_a?
-    assert score_b == FILL_ME_IN   # what is the minimization score for bits_b?
+    assert score_a == -9   # what is the minimization score for bits_a?
+    assert score_b == -13   # what is the minimization score for bits_b?
 
     # The selection with higher value has the lower (better) score
-    assert min(score_a, score_b) == FILL_ME_IN
+    assert min(score_a, score_b) == -13
 
 
 # ---------------------------------------------------------------------------
@@ -169,11 +169,11 @@ def test_06_penalized_objective():
     bits_feasible   = [1, 1, 1, 0, 1, 1, 0, 0]   # value=24, weight=15
     bits_infeasible = [1, 1, 0, 1, 0, 1, 0, 0]   # value=26, weight=18
 
-    assert score(bits_feasible)   == FILL_ME_IN   # what is the score?
-    assert score(bits_infeasible) == FILL_ME_IN   # what is the score?
+    assert score(bits_feasible)   == -24   # what is the score?
+    assert score(bits_infeasible) == 2974
 
     # Lower score is better — which solution does the optimizer prefer?
-    assert (score(bits_feasible) < score(bits_infeasible)) == FILL_ME_IN
+    assert (score(bits_feasible) < score(bits_infeasible)) == True
 
 
 # ---------------------------------------------------------------------------
@@ -193,7 +193,15 @@ def knapsack_score(bits, weights, values, capacity, penalty_weight=1000):
     Replace `pass` with your implementation.
     Hint: use zip(bits, weights) and zip(bits, values).
     """
-    pass  # TODO: implement this
+    total_weight = sum(b * w for b, w in zip(bits, weights))
+    total_value = sum(b * v for b, v in zip(bits, values))
+
+
+    if(total_weight > capacity):
+        return(-total_value + max(0, total_weight - capacity) * penalty_weight)
+    else:
+        return(-total_value + max(0, total_weight - capacity))
+    
 
 
 def test_07_implement_knapsack_score():

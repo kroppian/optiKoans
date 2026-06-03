@@ -49,14 +49,14 @@ def flip_bit(bit):
     """
 
     assert bit in (0, 1), f"flip_bit expects 0 or 1, got {bit!r}"
+    return 1 - bit
 
-    pass  # TODO: implement this
 
 
 def test_01_flip_bit():
     """flip_bit converts 1 to 0 and 0 to 1. Any other input raises AssertionError."""
-    assert flip_bit(1) == FILL_ME_IN   # flip a 1 → ?
-    assert flip_bit(0) == FILL_ME_IN   # flip a 0 → ?
+    assert flip_bit(1) == 0   # flip a 1 → ?
+    assert flip_bit(0) == 1   # flip a 0 → ?
 
 
 # ---------------------------------------------------------------------------
@@ -73,7 +73,7 @@ def test_02_random_trial():
     draw = random.random()   # first draw with seed 0
 
     rate = 0.5
-    assert (draw < rate) == FILL_ME_IN   # does this draw trigger a flip?
+    assert (draw < rate) == False   # does this draw trigger a flip?
 
 
 # ---------------------------------------------------------------------------
@@ -90,7 +90,7 @@ def test_03_mutate_a_genome():
     random.seed(0)
     mutated = [flip_bit(b) if random.random() < 0.5 else b for b in genome]
 
-    assert mutated == FILL_ME_IN
+    assert mutated == [1, 0, 0, 1, 1, 1, 1, 1]
 
 
 # ---------------------------------------------------------------------------
@@ -107,7 +107,7 @@ def test_04_length_is_preserved():
     random.seed(0)
     mutated = [flip_bit(b) if random.random() < 0.5 else b for b in genome]
 
-    assert len(mutated) == FILL_ME_IN
+    assert len(mutated) == 8
 
 
 # ---------------------------------------------------------------------------
@@ -121,9 +121,9 @@ def test_05_rate_one_flips_everything():
     Every bit flips — the result is the bitwise complement of the genome.
     """
     genome  = [1, 0, 1, 0, 1, 0, 1, 0]
-    mutated = [flip_bit(b) if random.random() < 1.0 else b for b in genome]
+    mutated = [flip_bit(b) if (random.random() < 1.0) else b for b in genome]
 
-    assert mutated == FILL_ME_IN
+    assert mutated == [0, 1, 0, 1, 0, 1, 0, 1]
 
 
 # ---------------------------------------------------------------------------
@@ -141,7 +141,9 @@ def mutate(bits, mutation_rate):
     Replace `pass` with your implementation.
     Hint: use a list comprehension with random.random() and flip_bit.
     """
-    pass  # TODO: implement this
+
+    return [flip_bit(b) if random.random() < mutation_rate else b for b in bits]
+    
 
 
 def test_06_implement_mutate():
