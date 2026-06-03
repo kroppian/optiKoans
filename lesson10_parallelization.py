@@ -94,10 +94,10 @@ def test_01_evaluate_shapes():
 
     # Compute one scalar objective per solution, then reshape for out["F"]
     f_values = [poly(x) for x in X]
-    assert f_values == [1, 14, 39, 0]         # list of scalar objectives
+    assert f_values == [3, 14, 39, 0]    # list of scalar objectives
 
     F = np.array(f_values).reshape(-1, 1)
-    assert F.shape == (1, 4)         # required shape for out["F"]
+    assert F.shape == (4, 1)         # required shape for out["F"]
 
 
 # ---------------------------------------------------------------------------
@@ -125,9 +125,9 @@ def test_02_threadpool_map():
     with ThreadPool(2) as pool:
         parallel = list(pool.map(poly, X))
 
-    assert serial               == FILL_ME_IN   # result of applying poly serially
-    assert parallel             == FILL_ME_IN   # same input, run concurrently
-    assert (serial == parallel) == FILL_ME_IN   # do they agree?
+    assert serial == [3, 14, 39, 0]    # result of applying poly serially
+    assert parallel == [3, 14, 39, 0]# same input, run concurrently
+    assert (serial == parallel) == True   # do they agree?
 
 
 # ---------------------------------------------------------------------------
@@ -151,12 +151,19 @@ class ParallelRastriginProblem(Problem):
   """
 
     def __init__(self, n_var=5, n_workers=4):
-        pass  # TODO: implement this
+        self.n_workers = n_workers
+        super().__init__(
+            n_var = n_var,
+            n_obj = 1,
+            xl = np.full(n_var, -5.12),
+            xu = np.full(n_var, 5.12),
+        )
 
     def _evaluate(self, X, out, *args, **kwargs):
-        pass  # TODO: implement this
-
-
+        with ThreadPool(self.n_workers) as pool:
+            results = pool.map(rastrigin, X)
+        out["F"] = np.array(results).reshape(-1, 1)
+        
 def test_03_parallel_rastrigin_problem():
     """
     Call _evaluate directly with three solutions at the global minimum.
@@ -189,7 +196,11 @@ def solve_rastrigin_parallel(n_var=5, pop_size=100, n_gen=200, seed=1, n_workers
       - Call minimize
       - Return res.X and res.F[0]
     """
-    pass  # TODO: implement this
+    problem = ParallelRastriginProblem(n_var = n_var)
+    algorithm = GA(pop_size=pop_size, eliminate_duplicates=True)
+    res = minimize(problem, algorithm, termination=('n_gen', n_gen), seed = seed, verbose = False)
+    return res.X, res.F[0]
+    
 
 
 def test_04_solve_parallel():

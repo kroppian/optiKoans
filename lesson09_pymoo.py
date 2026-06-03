@@ -129,7 +129,7 @@ def test_03_evaluate():
     problem = RastriginProblem(n_var=5)
     out = {}
     problem._evaluate(np.zeros(5), out)
-    assert out["F"] == FILL_ME_IN   # Rastrigin value at the origin
+    assert out["F"] == 0.0   # Rastrigin value at the origin
 
 
 # ---------------------------------------------------------------------------
@@ -146,9 +146,9 @@ def test_04_run_and_read():
     algorithm = GA(pop_size=100, eliminate_duplicates=True)
     res       = minimize(problem, algorithm, ('n_gen', 200), seed=1, verbose=False)
 
-    assert len(res.X)         == FILL_ME_IN   # one value per decision variable
-    assert len(res.F)         == FILL_ME_IN   # one value per objective
-    assert (res.F[0] < 10.0) == FILL_ME_IN   # did the GA find a good solution?
+    assert len(res.X)         == 5  # one value per decision variable
+    assert len(res.F)         == 1   # one value per objective
+    assert (res.F[0] < 10.0) == True   # did the GA find a good solution?
 
 
 # ---------------------------------------------------------------------------
@@ -169,7 +169,10 @@ def solve_rastrigin(n_var=5, pop_size=200, n_gen=500, seed=1):
       - Call minimize with termination=('n_gen', n_gen), seed=seed, verbose=False
       - Return res.X and res.F[0]
     """
-    pass  # TODO: implement this
+    problem = RastriginProblem(n_var = n_var)
+    algorithm = GA(pop_size=pop_size, eliminate_duplicates=True)
+    res = minimize(problem, algorithm, termination=('n_gen', n_gen), seed = seed, verbose = False)
+    return res.X, res.F[0]
 
 
 def test_05_solve_rastrigin():
