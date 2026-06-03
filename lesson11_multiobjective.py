@@ -72,6 +72,8 @@ def knapsack_objectives(bits, weights, values):
     return (-total_value, total_weight)
 
 
+# TODO let's add a new Koan that runs an epsilon constraint problem. In other words, run a simple pymoo GA 4 times with constraints along the theoretical PF. This will smoothly transition from a known concept (constraints) into a new concepts (Pareto optimality)
+
 # ---------------------------------------------------------------------------
 # Koan 01 — Two objectives
 # ---------------------------------------------------------------------------
@@ -99,6 +101,7 @@ def test_01_two_objectives():
 # ---------------------------------------------------------------------------
 # Koan 02 — Pareto dominance
 # ---------------------------------------------------------------------------
+# TODO Add an ASCII art plot that would demonstrate dominance. For example, a little ASCII plot of a minimalization problem with a series of points on a PF, points behind the PF that are dominated, a nadir point, and an ideal point
 
 def test_02_pareto_dominance():
     """
@@ -106,7 +109,8 @@ def test_02_pareto_dominance():
     objective AND strictly better on at least one.
 
     The *Pareto front* is the set of solutions that no other solution
-    dominates — these are the genuinely optimal tradeoffs.
+    dominates — these solutions represent the trade-offs of solutions
+    amongst the multiobjective objective space.
 
     Work through the three comparisons below. Each uses the
     dominance check for two objectives (f1, f2) where lower is better:
@@ -117,21 +121,16 @@ def test_02_pareto_dominance():
     Useful shortcut: if both conditions hold, A is at least as good on
     both objectives; and because the values differ, at least one must
     be strictly better.
+
+    TODO remind user if this is a minimization or maximizaiton problem
     """
-    # A = (-24, 15): value=24, weight=15  (lesson-08 optimal)
+    # A = (-24, 15): value=24, weight=15  (Optimal solution from lesson 08)
     # B = (-21, 13): value=21, weight=13  (lighter but less valuable)
-    # A has better f1 (-24 < -21) but worse f2 (15 > 13) → neither dominates
     assert ((-24 <= -21) and (15 <= 13)) == FILL_ME_IN   # does A dominate B?
 
     # A = (-24, 15): value=24, weight=15
     # C = (-20, 16): value=20, weight=16  (worse on both)
-    # A has better f1 (-24 < -20) AND better f2 (15 < 16) → A dominates C
     assert ((-24 <= -20) and (15 <= 16)) == FILL_ME_IN   # does A dominate C?
-
-    # The Pareto front of {A=(-24,15), B=(-21,13), C=(-20,16)}:
-    # A dominates C, so C is excluded. A and B are mutually non-dominated.
-    # How many solutions are on the Pareto front?
-    assert FILL_ME_IN == 2
 
 
 # ---------------------------------------------------------------------------
@@ -239,3 +238,6 @@ def test_05_solve():
     # should match or beat the lesson-08 optimal of value=24 (f1=−24).
     best_value_idx = np.argmin(pareto_F[:, 0])
     assert pareto_F[best_value_idx, 0] <= -24
+
+    # TODO print out the result as a matplotlib figure 
+
